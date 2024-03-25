@@ -13,15 +13,17 @@ def menu_selection(event):
     selected_item = event.widget.get()
     print(f"Menu sélectionné : {selected_item}")
     if selected_item == "Option 2":
-        bouton_importer.pack()
+        bouton_importer_dossier.pack()
     else:
-        bouton_importer.pack_forget()
+        bouton_importer_dossier.pack_forget()
 
-def importer_fichier():
-    fichier = filedialog.askopenfilename(filetypes=[("Fichiers texte", "*.txt"), ("Fichiers TIFF", "*.tif;*.tiff"), ("Tous les fichiers", "*.*")])
-    if fichier:
-        print(f"Fichier importé : {fichier}")
-        label_fichier.config(text=f"Fichier sélectionné : {fichier}")
+
+
+def importer_dossier():
+    dossier = filedialog.askdirectory()
+    if dossier:
+        print(f"Dossier importé : {dossier}")
+        label_dossier.config(text=f"Dossier sélectionné : {dossier}")
 
 # Créer la fenêtre principale
 fenetre = tk.Tk()
@@ -68,16 +70,11 @@ content_frame.pack(padx=20, pady=20, fill=tk.BOTH, expand=True)
 label = ttk.Label(content_frame, text="Ceci est une interface graphique avec Tkinter!", font=('Helvetica', 16))
 label.pack(pady=20)
 
-# Bouton "Importer Fichier"
-bouton_importer = ttk.Button(content_frame, text="Importer Fichier", command=importer_fichier)
-bouton_importer.pack(pady=10)
+# Bouton "Importer Dossier"
+bouton_importer_dossier = ttk.Button(content_frame, text="Importer Dossier", command=importer_dossier)
 
-# Label pour afficher le chemin du fichier sélectionné
-label_fichier = ttk.Label(content_frame, text="", font=('Helvetica', 12), wraplength=400)
-label_fichier.pack(pady=10)
+label_dossier = ttk.Label(content_frame, text="", font=('Helvetica', 12), wraplength=400)
 
-# Masquer le bouton "Importer Fichier" initialement
-bouton_importer.pack_forget()
 
 # Créer un Frame pour le footer
 footer_frame = ttk.Frame(fenetre)
