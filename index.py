@@ -1,6 +1,7 @@
 import os
 import tkinter as tk
 from tkinter import ttk, filedialog
+from PIL import Image, ImageTk
 
 def afficher_message():
     print("Bonjour, Tkinter!")
@@ -27,14 +28,16 @@ def importer_dossier():
 
 def afficher_images_dossier(dossier):
     # Récupérer la liste des fichiers images dans le dossier
-    fichiers_images = [f for f in os.listdir(dossier) if f.endswith('.gif')]  # Filtrer les fichiers pour ne garder que les .gif
+    fichiers_images = [f for f in os.listdir(dossier) if f.endswith('.tif')]  # Filtrer les fichiers pour ne garder que les .tif
     
     # Afficher les images dans l'interface
     for fichier in fichiers_images:
         chemin_image = os.path.join(dossier, fichier)
-        image = tk.PhotoImage(file=chemin_image)
-        label_image = ttk.Label(content_frame, image=image)
-        label_image.image = image  # Gardez une référence à l'image pour éviter qu'elle ne soit détruite par le garbage collector
+        img = Image.open(chemin_image)
+        img = img.resize((100, 100), Image.ANTIALIAS)  # Redimensionner l'image selon vos besoins
+        photo = ImageTk.PhotoImage(img)
+        label_image = ttk.Label(content_frame, image=photo)
+        label_image.image = photo  # Gardez une référence à l'image pour éviter qu'elle ne soit détruite par le garbage collector
         label_image.pack(pady=5)
 
 # Créer la fenêtre principale
@@ -84,9 +87,49 @@ label.pack(pady=20)
 
 # Bouton "Importer Dossier"
 bouton_importer_dossier = ttk.Button(content_frame, text="Importer Dossier", command=importer_dossier)
+bouton_importer_dossier.pack()
+
+# Suite du code
 
 label_dossier = ttk.Label(content_frame, text="", font=('Helvetica', 12), wraplength=400)
+label_dossier.pack()
 
+# Créer un Frame pour afficher les images
+images_frame = ttk.Frame(content_frame)
+images_frame.pack(pady=20)
+
+# Créer un Scrollbar pour les images
+scrollbar = ttk.Scrollbar(images_frame, orient=tk.VERTICAL)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+# Créer un Canvas pour contenir les images avec la scrollbar
+canvas = tk.Canvas(images_frame, bd=0, highlightthickness=0, yscrollcommand=scrollbar.set)
+canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+scrollbar.config(command=canvas.yview)
+
+# Ajouter un Frame à l'intérieur du Canvas pour les images
+canvas_frame = ttk.Frame(canvas)
+canvas.create_window((0, 0), window=canvas_frame, anchor=tk.NW)
+
+# Fonction pour ajuster la taille du Canvas en fonction du contenu
+def on_configure(event):
+    canvas.configure(scrollregion=canvas.bbox("all"))
+
+canvas_frame.bind("<Configure>", on_configure)
+
+def afficher_images_dossier(dossier):
+    # Récupérer la liste des fichiers images dans le dossier
+    fichiers_images = [f for f in os.listdir(dossier) if f.endswith('.tif')]  # Filtrer les fichiers pour ne garder que les .tif
+    
+    # Afficher les images dans l'interface
+    for fichier in fichiers_images:
+        chemin_image = os.path.join(dossier, fichier)
+        img = Image.open(chemin_image)
+        img = img.resize((100, 100), Image.ANTIALIAS)  # Redimensionner l'image selon vos besoins
+        photo = ImageTk.PhotoImage(img)
+        label_image = ttk.Label(canvas_frame, image=photo)
+        label_image.image = photo  # Gardez une référence à l'image pour éviter qu'elle ne soit détruite par le garbage collector
+        label_image.pack(pady=5, padx=5)
 
 # Créer un Frame pour le footer
 footer_frame = ttk.Frame(fenetre)
