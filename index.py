@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from tkinter import ttk, filedialog
 
@@ -17,13 +18,24 @@ def menu_selection(event):
     else:
         bouton_importer_dossier.pack_forget()
 
-
-
 def importer_dossier():
     dossier = filedialog.askdirectory()
     if dossier:
         print(f"Dossier importé : {dossier}")
         label_dossier.config(text=f"Dossier sélectionné : {dossier}")
+        afficher_images_dossier(dossier)
+
+def afficher_images_dossier(dossier):
+    # Récupérer la liste des fichiers images dans le dossier
+    fichiers_images = [f for f in os.listdir(dossier) if f.endswith('.gif')]  # Filtrer les fichiers pour ne garder que les .gif
+    
+    # Afficher les images dans l'interface
+    for fichier in fichiers_images:
+        chemin_image = os.path.join(dossier, fichier)
+        image = tk.PhotoImage(file=chemin_image)
+        label_image = ttk.Label(content_frame, image=image)
+        label_image.image = image  # Gardez une référence à l'image pour éviter qu'elle ne soit détruite par le garbage collector
+        label_image.pack(pady=5)
 
 # Créer la fenêtre principale
 fenetre = tk.Tk()
