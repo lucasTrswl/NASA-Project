@@ -34,11 +34,11 @@ def afficher_images_dossier(dossier):
     for fichier in fichiers_images:
         chemin_image = os.path.join(dossier, fichier)
         img = Image.open(chemin_image)
-        img = img.resize((100, 100), Image.ANTIALIAS)  # Redimensionner l'image selon vos besoins
+        img = img.resize((100, 100))  # Redimensionner l'image selon vos besoins sans utiliser ANTIALIAS
         photo = ImageTk.PhotoImage(img)
-        label_image = ttk.Label(content_frame, image=photo)
+        label_image = ttk.Label(canvas_frame, image=photo)
         label_image.image = photo  # Gardez une référence à l'image pour éviter qu'elle ne soit détruite par le garbage collector
-        label_image.pack(pady=5)
+        label_image.pack(pady=5, padx=5)
 
 # Créer la fenêtre principale
 fenetre = tk.Tk()
@@ -116,20 +116,6 @@ def on_configure(event):
     canvas.configure(scrollregion=canvas.bbox("all"))
 
 canvas_frame.bind("<Configure>", on_configure)
-
-def afficher_images_dossier(dossier):
-    # Récupérer la liste des fichiers images dans le dossier
-    fichiers_images = [f for f in os.listdir(dossier) if f.endswith('.tif')]  # Filtrer les fichiers pour ne garder que les .tif
-    
-    # Afficher les images dans l'interface
-    for fichier in fichiers_images:
-        chemin_image = os.path.join(dossier, fichier)
-        img = Image.open(chemin_image)
-        img = img.resize((100, 100), Image.ANTIALIAS)  # Redimensionner l'image selon vos besoins
-        photo = ImageTk.PhotoImage(img)
-        label_image = ttk.Label(canvas_frame, image=photo)
-        label_image.image = photo  # Gardez une référence à l'image pour éviter qu'elle ne soit détruite par le garbage collector
-        label_image.pack(pady=5, padx=5)
 
 # Créer un Frame pour le footer
 footer_frame = ttk.Frame(fenetre)
