@@ -1,3 +1,4 @@
+import cv2
 import os
 import tkinter as tk
 from tkinter import ttk, filedialog
@@ -41,18 +42,20 @@ def afficher_images_dossier(dossier):
     images_photo.clear()
 
     # Récupérer la liste des fichiers images dans le dossier
-    fichiers_images = [f for f in os.listdir(dossier) if f.endswith('.tif')]  
+    fichiers_images = [f for f in os.listdir(dossier) if f.endswith(('.tif'))]
     
     # Afficher les images dans l'interface
     for fichier in fichiers_images:
         chemin_image = os.path.join(dossier, fichier)
         img = Image.open(chemin_image)
-        img = img.resize((100, 100))  # Redimensionner l'image selon vos besoins sans utiliser ANTIALIAS
+        
+        img = img.resize((150, 150))  # Redimensionner l'image selon vos besoins sans utiliser ANTIALIAS
         img = ImageTk.PhotoImage(img)
         images_photo.append(img)  # Ajouter le PhotoImage à la liste
         label_image = ttk.Label(canvas_frame, image=img)
         label_image.photo = img  # Conserver une référence à l'objet PhotoImage
         label_image.pack(pady=5, padx=5)
+
 
 # Créer la fenêtre principale
 fenetre = tk.Tk()
@@ -141,3 +144,5 @@ bouton.pack(pady=10)
 
 # Lancer la boucle principale
 fenetre.mainloop()
+
+cv2.destroyAllWindows()
