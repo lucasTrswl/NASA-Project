@@ -1,5 +1,9 @@
+import cv2
+import os
 import tkinter as tk
 from tkinter import ttk, filedialog
+from PIL import Image, ImageTk
+
 
 def afficher_message():
     print("Bonjour, Tkinter!")
@@ -17,18 +21,46 @@ def menu_selection(event):
     else:
         bouton_importer_dossier.pack_forget()
 
-
-
 def importer_dossier():
     dossier = filedialog.askdirectory()
     if dossier:
         print(f"Dossier importé : {dossier}")
         label_dossier.config(text=f"Dossier sélectionné : {dossier}")
+        afficher_images_dossier(dossier)
+
+# Liste pour stocker les objets PhotoImage
+images_photo = []
+
+def afficher_images_dossier(dossier):
+    global images_photo
+    
+    # Effacer les images précédentes
+    for widget in canvas_frame.winfo_children():
+        widget.destroy()
+    
+    # Effacer les objets PhotoImage précédents
+    images_photo.clear()
+
+    # Récupérer la liste des fichiers images dans le dossier
+    fichiers_images = [f for f in os.listdir(dossier) if f.endswith(('.tif'))]
+    
+    # Afficher les images dans l'interface
+    for fichier in fichiers_images:
+        chemin_image = os.path.join(dossier, fichier)
+        img = Image.open(chemin_image)
+        
+        img = img.resize((150, 150))  # Redimensionner l'image selon vos besoins sans utiliser ANTIALIAS
+        img = ImageTk.PhotoImage(img)
+        images_photo.append(img)  # Ajouter le PhotoImage à la liste
+        label_image = ttk.Label(canvas_frame, image=img)
+        label_image.photo = img  # Conserver une référence à l'objet PhotoImage
+        label_image.pack(pady=5, padx=5)
+
 
 # Créer la fenêtre principale
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
-fenetre.geometry("600x400")
+fenetre.geometry("800x600")
 fenetre.configure(bg=couleur_blanc)
 
 # Style pour les widgets ttk
@@ -72,9 +104,35 @@ label.pack(pady=20)
 
 # Bouton "Importer Dossier"
 bouton_importer_dossier = ttk.Button(content_frame, text="Importer Dossier", command=importer_dossier)
+bouton_importer_dossier.pack()
+
+# Suite du code
 
 label_dossier = ttk.Label(content_frame, text="", font=('Helvetica', 12), wraplength=400)
+label_dossier.pack()
 
+# Créer un Frame pour afficher les images
+images_frame = ttk.Frame(content_frame)
+images_frame.pack(pady=20)
+
+# Créer un Scrollbar pour les images
+scrollbar = ttk.Scrollbar(images_frame, orient=tk.VERTICAL)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+# Créer un Canvas pour contenir les images avec la scrollbar
+canvas = tk.Canvas(images_frame, bd=0, highlightthickness=0, yscrollcommand=scrollbar.set)
+canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+scrollbar.config(command=canvas.yview)
+
+# Ajouter un Frame à l'intérieur du Canvas pour les images
+canvas_frame = ttk.Frame(canvas)
+canvas.create_window((0, 0), window=canvas_frame, anchor=tk.NW)
+
+# Fonction pour ajuster la taille du Canvas en fonction du contenu
+def on_configure(event):
+    canvas.configure(scrollregion=canvas.bbox("all"))
+
+canvas_frame.bind("<Configure>", on_configure)
 
 # Créer un Frame pour le footer
 footer_frame = ttk.Frame(fenetre)
@@ -86,3 +144,5 @@ bouton.pack(pady=10)
 
 # Lancer la boucle principale
 fenetre.mainloop()
+
+cv2.destroyAllWindows()
