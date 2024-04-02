@@ -1,39 +1,41 @@
-"""
-Classe MultiThread + exemple d'utilisation
-"""
-
 import threading
-import time
-
+from .convert import convertir_fichier
 
 class MultiThread(threading.Thread):
     """
-    Extension de la classe Threading
+    Extension de la classe Threading utilisée pour le traitement multitâche des fichiers.
+    
     Params:
-    - name : nom du Thread
-    - delay : delay pour chaque thread
+    - threading.Thread: Classe de base pour créer des threads.
     """
 
-    def __init__(self, name, delay):
+    def __init__(self, name, files, dossier_source, dossier_destination):
+        """
+        Initialisation de la classe MultiThread.
+
+        Params:
+        - self (MultiThread): L'instance de la classe MultiThread.
+        - name (str): Nom du thread.
+        - files (list): Liste des fichiers à traiter par ce thread.
+        - dossier_source (str): Le chemin du dossier source.
+        - dossier_destination (str): Le chemin du dossier de destination.
+        """
         threading.Thread.__init__(self)
         self.name = name
-        self.delay = delay
+        self.files = files
+        self.dossier_source = dossier_source
+        self.dossier_destination = dossier_destination
 
     def run(self):
-        # exemple de function
+        """
+        Méthode exécutée lorsqu'un thread est démarré.
+        Elle appelle la fonction pour convertir les fichiers.
+
+        Params:
+        - self (MultiThread): L'instance de la classe MultiThread.
+        """
         print("Starting " + self.name)
-        time.sleep(self.delay)
-        print("Exiting {self.name} with delay of {self.delay}s")
-
-
-# Créer des tâches
-thread1 = MultiThread("Thread-1", 10)
-thread2 = MultiThread("Thread-2", 5)
-
-# commencer des tâches
-thread1.start()
-thread2.start()
-# Rejoindre la tâche principale
-thread1.join()
-thread2.join()
-print("Exiting Main Thread")
+        for fichier in self.files:
+            if fichier.endswith('.tif'):
+                convertir_fichier(fichier, self.dossier_source, self.dossier_destination)
+        print("Exiting", self.name)
