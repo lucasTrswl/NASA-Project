@@ -1,14 +1,11 @@
-import cv2
 import os
 import tkinter as tk
 from tkinter import ttk, filedialog
 from PIL import Image, ImageTk
 
-
 def afficher_message():
     print("Bonjour, Tkinter!")
 
-# Couleurs Gendarmerie Française
 couleur_bleu = "#0055A4"
 couleur_blanc = "#FFFFFF"
 couleur_gris = "#F0F0F0"
@@ -20,6 +17,8 @@ def menu_selection(event):
         bouton_importer_dossier.pack()
     else:
         bouton_importer_dossier.pack_forget()
+        bouton_suivant.pack_forget()
+        bouton_precedent.pack_forget()
 
 def importer_dossier():
     dossier = filedialog.askdirectory()
@@ -27,46 +26,41 @@ def importer_dossier():
         print(f"Dossier importé : {dossier}")
         label_dossier.config(text=f"Dossier sélectionné : {dossier}")
         afficher_images_dossier(dossier)
+        bouton_suivant.pack()
+        bouton_precedent.pack()
 
-# Liste pour stocker les objets PhotoImage
 images_photo = []
 
 def afficher_images_dossier(dossier):
     global images_photo
-    
-    # Effacer les images précédentes
-    for widget in canvas_frame.winfo_children():
-        widget.destroy()
-    
-    # Effacer les objets PhotoImage précédents
     images_photo.clear()
 
-    # Récupérer la liste des fichiers images dans le dossier
+    for widget in canvas_frame.winfo_children():
+        widget.destroy()
+
     fichiers_images = [f for f in os.listdir(dossier) if f.endswith(('.tif'))]
-    
-    # Afficher les images dans l'interface
+
     for fichier in fichiers_images:
         chemin_image = os.path.join(dossier, fichier)
         img = Image.open(chemin_image)
-        
-        img = img.resize((150, 150))  # Redimensionner l'image selon vos besoins sans utiliser ANTIALIAS
+
+        img = img.resize((400, 400))
         img = ImageTk.PhotoImage(img)
-        images_photo.append(img)  # Ajouter le PhotoImage à la liste
-        label_image = ttk.Label(canvas_frame, image=img)
-        label_image.photo = img  # Conserver une référence à l'objet PhotoImage
-        label_image.pack(pady=5, padx=5)
+        images_photo.append(img)
 
+    afficher_image(0)
 
-# Créer la fenêtre principale
+def afficher_image(index):
+    canvas.delete("all")
+    canvas.create_image(0, 0, anchor="nw", image=images_photo[index])
+
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
-fenetre.geometry("800x600")
+fenetre.geometry("800x800")
 fenetre.configure(bg=couleur_blanc)
 
-# Style pour les widgets ttk
 style = ttk.Style()
 
-# Couleurs pour le style
 style.theme_create("gendarmerie_style", parent="alt", settings={
     "TLabel": {"configure": {"foreground": couleur_bleu, "background": couleur_blanc, "font": ('Helvetica', 12)}},
     "TButton": {"configure": {"foreground": couleur_blanc, "background": couleur_bleu, "font": ('Helvetica', 12, 'bold')}},
@@ -78,71 +72,65 @@ style.theme_create("gendarmerie_style", parent="alt", settings={
 
 style.theme_use("gendarmerie_style")
 
-# Créer un Frame pour le header
 header_frame = ttk.Frame(fenetre)
 header_frame.pack(side=tk.TOP, fill=tk.X)
 
-# Ajouter un Label dans le header
 header_label = ttk.Label(header_frame, text="Mon Application Tkinter", font=('Helvetica', 20, 'bold'), background=couleur_bleu, foreground=couleur_blanc)
 header_label.pack(padx=10, pady=10, fill=tk.X)
 
-# Menu déroulant dans le header
 menu_options = ["Option 1", "Option 2", "Option 3"]
 selected_option = tk.StringVar()
 menu = ttk.Combobox(header_frame, textvariable=selected_option, values=menu_options, width=15, font=('Helvetica', 12))
 menu.bind("<<ComboboxSelected>>", menu_selection)
-menu.current(0)  # Sélectionner le premier élément par défaut
+menu.current(0)
 menu.pack(side=tk.LEFT, padx=10, pady=(0, 10))
 
-# Créer un Frame pour le contenu principal
 content_frame = ttk.Frame(fenetre)
 content_frame.pack(padx=20, pady=20, fill=tk.BOTH, expand=True)
 
-# Ajouter un Label dans le contenu
 label = ttk.Label(content_frame, text="Ceci est une interface graphique avec Tkinter!", font=('Helvetica', 16))
 label.pack(pady=20)
 
-# Bouton "Importer Dossier"
 bouton_importer_dossier = ttk.Button(content_frame, text="Importer Dossier", command=importer_dossier)
 bouton_importer_dossier.pack()
-
-# Suite du code
 
 label_dossier = ttk.Label(content_frame, text="", font=('Helvetica', 12), wraplength=400)
 label_dossier.pack()
 
-# Créer un Frame pour afficher les images
 images_frame = ttk.Frame(content_frame)
 images_frame.pack(pady=20)
 
-# Créer un Scrollbar pour les images
-scrollbar = ttk.Scrollbar(images_frame, orient=tk.VERTICAL)
-scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
-# Créer un Canvas pour contenir les images avec la scrollbar
-canvas = tk.Canvas(images_frame, bd=0, highlightthickness=0, yscrollcommand=scrollbar.set)
+canvas = tk.Canvas(images_frame, bd=0, highlightthickness=0, width=400, height=400)
 canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-scrollbar.config(command=canvas.yview)
 
-# Ajouter un Frame à l'intérieur du Canvas pour les images
 canvas_frame = ttk.Frame(canvas)
 canvas.create_window((0, 0), window=canvas_frame, anchor=tk.NW)
 
-# Fonction pour ajuster la taille du Canvas en fonction du contenu
 def on_configure(event):
     canvas.configure(scrollregion=canvas.bbox("all"))
 
 canvas_frame.bind("<Configure>", on_configure)
 
-# Créer un Frame pour le footer
+
+def suivante():
+    global current_index
+    current_index = (current_index + 1) % len(images_photo)
+    afficher_image(current_index)
+
+def precedente():
+    global current_index
+    current_index = (current_index - 1) % len(images_photo)
+    afficher_image(current_index)
+
+bouton_suivant = ttk.Button(content_frame, text="Suivant", command=suivante)
+bouton_precedent = ttk.Button(content_frame, text="Précédent", command=precedente)
+
 footer_frame = ttk.Frame(fenetre)
 footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
-# Créer un bouton pour le footer
 bouton = ttk.Button(footer_frame, text="Cliquez ici", command=afficher_message)
 bouton.pack(pady=10)
 
-# Lancer la boucle principale
-fenetre.mainloop()
+current_index = 0
 
-cv2.destroyAllWindows()
+fenetre.mainloop()
