@@ -111,7 +111,7 @@ def on_configure(event):
 
 canvas_frame.bind("<Configure>", on_configure)
 
-
+#Passer à l'image suivante
 def suivante():
     global current_index
     current_index = (current_index + 1) % len(images_photo)
