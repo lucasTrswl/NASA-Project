@@ -20,8 +20,8 @@ def conversion_manager():
     # Parcourir tous les fichiers dans le dossier source
     fichiers = os.listdir(dossier_source)
 
-    # Créer les threads par lots de 50 fichiers
-    batch_size = 50 
+    # Créer les threads par lots de "batch_size" fichiers
+    batch_size = 100
     threads = []
 
     num_files = len(fichiers)
