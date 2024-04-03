@@ -15,6 +15,9 @@ def menu_selection(event):
     print(f"Menu sélectionné : {selected_item}")
     if selected_item == "Option 2":
         bouton_importer_dossier.pack()
+        if images_photo:
+            bouton_suivant.pack()
+            bouton_precedent.pack()
     else:
         bouton_importer_dossier.pack_forget()
         bouton_suivant.pack_forget()
@@ -27,8 +30,9 @@ def importer_dossier():
         print(f"Dossier importé : {dossier}")
         label_dossier.config(text=f"Dossier sélectionné : {dossier}")
         afficher_images_dossier(dossier)
-        bouton_suivant.pack()
-        bouton_precedent.pack()
+        if selected_option.get() == "Option 2":
+            bouton_suivant.pack()
+            bouton_precedent.pack()
 
 images_photo = []
 
@@ -129,10 +133,7 @@ def precedente():
     afficher_image(current_index)
 
 bouton_suivant = ttk.Button(content_frame, text="Suivant", command=suivante)
-bouton_suivant.pack(side=tk.RIGHT, padx=10)
-
 bouton_precedent = ttk.Button(content_frame, text="Précédent", command=precedente)
-bouton_precedent.pack(side=tk.LEFT, padx=10)
 
 footer_frame = ttk.Frame(fenetre)
 footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
