@@ -21,6 +21,7 @@ def menu_selection(event):
         bouton_precedent.pack_forget()
 
 def importer_dossier():
+    global dossier
     dossier = filedialog.askdirectory()
     if dossier:
         print(f"Dossier importé : {dossier}")
@@ -45,7 +46,7 @@ def afficher_images_dossier(dossier):
         img = Image.open(chemin_image)
 
         img = img.resize((400, 400))
-        img = ImageTk.PhotoImage(img)
+        img = ImageTk.PhotoImage(img, master=fenetre)  # Ajout du paramètre master pour éviter une erreur de garbage collection
         images_photo.append(img)
 
     afficher_image(0)
@@ -53,6 +54,10 @@ def afficher_images_dossier(dossier):
 def afficher_image(index):
     canvas.delete("all")
     canvas.create_image(0, 0, anchor="nw", image=images_photo[index])
+
+    # Affichage du nom de l'image en haut à gauche
+    image_name = os.path.basename(os.path.splitext(os.listdir(dossier)[index])[0])
+    canvas.create_text(10, 10, anchor="nw", text=image_name, fill="white", font=('Helvetica', 12, 'bold'))
 
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
@@ -124,7 +129,10 @@ def precedente():
     afficher_image(current_index)
 
 bouton_suivant = ttk.Button(content_frame, text="Suivant", command=suivante)
+bouton_suivant.pack(side=tk.RIGHT, padx=10)
+
 bouton_precedent = ttk.Button(content_frame, text="Précédent", command=precedente)
+bouton_precedent.pack(side=tk.LEFT, padx=10)
 
 footer_frame = ttk.Frame(fenetre)
 footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
