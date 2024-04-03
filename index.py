@@ -3,6 +3,9 @@ import tkinter as tk
 from tkinter import ttk, filedialog
 from PIL import Image, ImageTk
 
+
+current_index = 0
+ 
 def afficher_message():
     print("Bonjour, Tkinter!")
 
@@ -132,6 +135,5 @@ footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
 bouton = ttk.Button(footer_frame, text="Cliquez ici", command=afficher_message)
 bouton.pack(pady=10)
 
-current_index = 0
 
 fenetre.mainloop()
