@@ -128,6 +128,10 @@ def importer_dossier():
     else:
         print("Aucun dossier sélectionné.")
 
+    # Affichage du nom de l'image en haut à gauche
+    image_name = os.path.basename(os.path.splitext(os.listdir(dossier)[index])[0])
+    canvas.create_text(10, 10, anchor="nw", text=image_name, fill="white", font=('Helvetica', 12, 'bold'))
+
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
 fenetre.geometry("800x800")
