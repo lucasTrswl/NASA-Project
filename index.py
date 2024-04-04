@@ -6,10 +6,6 @@ from PIL import Image, ImageTk
 def afficher_message():
     print("Bonjour, Tkinter!")
 
-couleur_bleu = "#0055A4"
-couleur_blanc = "#FFFFFF"
-couleur_gris = "#F0F0F0"
-
 def menu_selection(event):
     selected_item = event.widget.get()
     print(f"Menu sélectionné : {selected_item}")
@@ -82,21 +78,37 @@ def on_resize(event):
     new_font_size = int(-10 * event.height / 800)
     canvas.itemconfig(image_name_text, font=('Helvetica', new_font_size, 'bold'))
 
+def suivante(event=None):
+    global current_index
+    current_index = (current_index + 1) % len(images_photo)
+    afficher_image(current_index)
+
+def precedente(event=None):
+    global current_index
+    current_index = (current_index - 1) % len(images_photo)
+    afficher_image(current_index)
+
+def on_mouse_wheel(event):
+    if event.delta < 0:
+        suivante()
+    else:
+        precedente()
+
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
 fenetre.geometry("800x800")
-fenetre.configure(bg=couleur_blanc)
 fenetre.bind("<Configure>", on_resize)  # Appeler on_resize lors du redimensionnement
+fenetre.bind("<MouseWheel>", on_mouse_wheel)  # Gestion du scroll de la souris
 
 style = ttk.Style()
 
 style.theme_create("gendarmerie_style", parent="alt", settings={
-    "TLabel": {"configure": {"foreground": couleur_bleu, "background": couleur_blanc, "font": ('Helvetica', 12)}},
-    "TButton": {"configure": {"foreground": couleur_blanc, "background": couleur_bleu, "font": ('Helvetica', 12, 'bold')}},
-    "TFrame": {"configure": {"background": couleur_blanc}},
-    "TCombobox": {"configure": {"foreground": couleur_bleu, "background": couleur_blanc, "font": ('Helvetica', 12)}},
-    "TCombobox.Border": {"configure": {"foreground": couleur_bleu, "background": couleur_bleu}},
-    "TCombobox.field": {"configure": {"foreground": couleur_bleu, "background": couleur_blanc, "font": ('Helvetica', 12)}},
+    "TLabel": {"configure": {"foreground": "#0055A4", "background": "#FFFFFF", "font": ('Helvetica', 12)}},
+    "TButton": {"configure": {"foreground": "#FFFFFF", "background": "#0055A4", "font": ('Helvetica', 12, 'bold')}},
+    "TFrame": {"configure": {"background": "#FFFFFF"}},
+    "TCombobox": {"configure": {"foreground": "#0055A4", "background": "#FFFFFF", "font": ('Helvetica', 12)}},
+    "TCombobox.Border": {"configure": {"foreground": "#0055A4", "background": "#0055A4"}},
+    "TCombobox.field": {"configure": {"foreground": "#0055A4", "background": "#FFFFFF", "font": ('Helvetica', 12)}},
 })
 
 style.theme_use("gendarmerie_style")
@@ -104,7 +116,7 @@ style.theme_use("gendarmerie_style")
 header_frame = ttk.Frame(fenetre)
 header_frame.pack(side=tk.TOP, fill=tk.X)
 
-header_label = ttk.Label(header_frame, text="Mon Application Tkinter", font=('Helvetica', 20, 'bold'), background=couleur_bleu, foreground=couleur_blanc)
+header_label = ttk.Label(header_frame, text="Mon Application Tkinter", font=('Helvetica', 20, 'bold'), background="#0055A4", foreground="#FFFFFF")
 header_label.pack(padx=10, pady=10, fill=tk.X)
 
 menu_options = ["Option 1", "Option 2", "Option 3"]
@@ -123,7 +135,6 @@ label.pack(pady=20)
 bouton_importer_dossier = ttk.Button(content_frame, text="Importer Dossier", command=importer_dossier)
 bouton_importer_dossier.pack()
 
-
 label_dossier = ttk.Label(content_frame, text="", font=('Helvetica', 12), wraplength=400)
 label_dossier.pack()
 
@@ -140,18 +151,6 @@ def on_configure(event):
     canvas.configure(scrollregion=canvas.bbox("all"))
 
 canvas_frame.bind("<Configure>", on_configure)
-
-# Passer à l'image suivante
-def suivante():
-    global current_index
-    current_index = (current_index + 1) % len(images_photo)
-    afficher_image(current_index)
-
-# Passer à l'image précédente
-def precedente():
-    global current_index
-    current_index = (current_index - 1) % len(images_photo)
-    afficher_image(current_index)
 
 # Créer les boutons pour passer aux images suivante et précédente
 bouton_precedent = ttk.Button(content_frame, text="Précédent", command=precedente)
