@@ -1,3 +1,5 @@
 # virtual environment
 virtual-env/
 */__pycache__
+project/*
+!project/.gitkeep 
