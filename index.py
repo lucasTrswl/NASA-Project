@@ -151,6 +151,22 @@ def on_resize(event):
     new_font_size = int(-10 * event.height / 800)
     canvas.itemconfig(image_name_text, font=('Helvetica', new_font_size, 'bold'))
 
+def suivante(event=None):
+    global current_index
+    current_index = (current_index + 1) % len(images_photo)
+    afficher_image(current_index)
+
+def precedente(event=None):
+    global current_index
+    current_index = (current_index - 1) % len(images_photo)
+    afficher_image(current_index)
+
+def on_mouse_wheel(event):
+    if event.delta < 0:
+        suivante()
+    else:
+        precedente()
+
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
 fenetre.geometry("800x800")
