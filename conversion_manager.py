@@ -2,16 +2,12 @@ import os
 import time
 from modules.thread import MultiThread
 
-def conversion_manager():
+def conversion_manager(type, dossier_source, dossier_destination):
     """
     Fonction principale pour coordonner la conversion des fichiers en utilisant des threads.
     """
     # Mesurer le temps écoulé avant de commencer les opérations
     debut_total = time.time()
-
-    # Chemins des dossiers source et destination
-    dossier_source = "../ECHO-DOT"
-    dossier_destination = "../MultiThread-Converted-ECHO-DOT"
 
     # Vérifier si le dossier de destination existe, sinon le créer
     if not os.path.exists(dossier_destination):
@@ -31,7 +27,7 @@ def conversion_manager():
         debut_batch = i * batch_size
         fin = min(debut_batch + batch_size, num_files)
         batch_files = fichiers[debut_batch:fin]
-        thread = MultiThread("Thread-" + str(i + 1), batch_files, dossier_source, dossier_destination)
+        thread = MultiThread("Thread-" + str(i + 1), batch_files, dossier_source, dossier_destination, type)
         threads.append(thread)
 
     # Démarrer les threads
@@ -47,4 +43,9 @@ def conversion_manager():
     print("La conversion a pris", temps_ecoule_total, "secondes.")
 
 if __name__ == "__main__":
-    conversion_manager()
+    # Type de traitement à effectuer
+    type = "convert"
+    # Chemins des dossiers source et destination
+    dossier_source = "../ECHO-DOT"
+    dossier_destination = "../MultiThread-Converted-ECHO-DOT"
+    conversion_manager(type, dossier_source, dossier_destination)
