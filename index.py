@@ -128,9 +128,28 @@ def importer_dossier():
     else:
         print("Aucun dossier sélectionné.")
 
-    # Affichage du nom de l'image en haut à gauche
-    image_name = os.path.basename(os.path.splitext(os.listdir(dossier)[index])[0])
-    canvas.create_text(10, 10, anchor="nw", text=image_name, fill="white", font=('Helvetica', 12, 'bold'))
+    global image_name_text
+    if show_image_name:  # Vérifier l'état du bouton
+        # Affichage du nom de l'image en haut à gauche
+        image_name = os.path.basename(os.path.splitext(os.listdir(dossier)[index])[0])
+        image_name_text = canvas.create_text(10, 10, anchor="nw", text=image_name, fill="white", font=('Helvetica', int(-10 * fenetre.winfo_height() / 800), 'bold'))
+
+def toggle_image_name():
+    global show_image_name
+    show_image_name = not show_image_name
+
+    if show_image_name:
+        bouton_toggle.config(text="Masquer Nom Image")
+        afficher_image(current_index)
+    else:
+        bouton_toggle.config(text="Afficher Nom Image")
+        canvas.delete(image_name_text)
+
+def on_resize(event):
+    # Appelé lors du redimensionnement de la fenêtre
+    # Ajuste la taille de la police en fonction de la taille de la fenêtre
+    new_font_size = int(-10 * event.height / 800)
+    canvas.itemconfig(image_name_text, font=('Helvetica', new_font_size, 'bold'))
 
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
