@@ -17,16 +17,12 @@ def menu_selection(event):
         bouton_importer_dossier.pack()
         bouton_suivant.pack()
         bouton_precedent.pack()
-        bouton_zoom_in.pack()  # Added
-        bouton_zoom_out.pack()  # Added
         label_dossier.pack()
         canvas.pack()
     else:
         bouton_importer_dossier.pack_forget()
         bouton_suivant.pack_forget()
         bouton_precedent.pack_forget()
-        bouton_zoom_in.pack_forget()
-        bouton_zoom_out.pack_forget()
         label_dossier.pack_forget()
         canvas.pack_forget()
         for widget in canvas_frame.winfo_children():
@@ -43,8 +39,6 @@ def importer_dossier():
         afficher_images_dossier(dossier)
         bouton_suivant.pack()
         bouton_precedent.pack()
-        bouton_zoom_in.pack()  # Added
-        bouton_zoom_out.pack()  # Added
 
 images_photo = []
 
@@ -58,7 +52,6 @@ def afficher_images_dossier(dossier):
     for fichier in fichiers_images:
         chemin_image = os.path.join(dossier, fichier)
         img = Image.open(chemin_image)
-
         img = img.resize((400, 400))
         img = ImageTk.PhotoImage(img)
         images_photo.append(img)
@@ -68,6 +61,38 @@ def afficher_images_dossier(dossier):
 def afficher_image(index):
     canvas.delete("all")
     canvas.create_image(0, 0, anchor="nw", image=images_photo[index])
+    canvas.image = images_photo[index]  # Référence à l'image pour éviter la suppression par le garbage collector
+
+def zoom(event):
+    global current_index
+    if event.delta > 0:
+        # Zoom in
+        zoom_factor = 1.1
+    else:
+        # Zoom out
+        zoom_factor = 0.9
+        
+    img = Image.open(os.path.join(dossier, fichiers_images[current_index]))
+    width, height = img.size
+    new_width = int(width * zoom_factor)
+    new_height = int(height * zoom_factor)
+    img = img.resize((new_width, new_height))
+    img = ImageTk.PhotoImage(img)
+    images_photo[current_index] = img
+    
+    canvas.delete("all")
+    canvas.image = img
+    canvas.create_image(0, 0, anchor="nw", image=img)
+    
+    # Réaligner le canvas après le zoom
+    canvas.configure(scrollregion=canvas.bbox("all"))
+    
+    # Ajuster le décalage de défilement pour garder l'image centrée
+    xscroll = (canvas.winfo_width() - new_width) / 2
+    yscroll = (canvas.winfo_height() - new_height) / 2
+    canvas.xview_moveto(xscroll / new_width)
+    canvas.yview_moveto(yscroll / new_height)
+
 
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
@@ -136,35 +161,17 @@ def precedente():
     current_index = (current_index - 1) % len(images_photo)
     afficher_image(current_index)
 
-def zoom_in():
-    global current_index
-    img = Image.open(os.path.join(dossier, fichiers_images[current_index]))
-    img = img.resize((int(img.width * 1.5), int(img.height * 1.5)))  # Zoom factor of 1.5
-    img = ImageTk.PhotoImage(img)
-    images_photo[current_index] = img
-    afficher_image(current_index)
-
-def zoom_out():
-    global current_index
-    img = Image.open(os.path.join(dossier, fichiers_images[current_index]))
-    img = img.resize((int(img.width / 1.5), int(img.height / 1.5)))  # Zoom factor of 1.5
-    img = ImageTk.PhotoImage(img)
-    images_photo[current_index] = img
-    afficher_image(current_index)
-
 bouton_suivant = ttk.Button(content_frame, text="Suivant", command=suivante)
 bouton_precedent = ttk.Button(content_frame, text="Précédent", command=precedente)
-bouton_zoom_in = ttk.Button(content_frame, text="Zoom In", command=zoom_in)
-bouton_zoom_out = ttk.Button(content_frame, text="Zoom Out", command=zoom_out)
 
 bouton_suivant.pack()
 bouton_precedent.pack()
-bouton_zoom_in.pack()  # Added
-bouton_zoom_out.pack()  # Added
+
+# Gestion de zoom par mouvement de souris
+canvas.bind("<MouseWheel>", zoom)
 
 footer_frame = ttk.Frame(fenetre)
 footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
-
 
 current_index = 0
 dossier = ""
