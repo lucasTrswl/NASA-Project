@@ -1,6 +1,8 @@
 import os
 import time
 from modules.thread import MultiThread
+from modules.config_file import write_config_file
+
 
 def conversion_manager(type, dossier_source, dossier_destination):
     """
@@ -27,7 +29,13 @@ def conversion_manager(type, dossier_source, dossier_destination):
         debut_batch = i * batch_size
         fin = min(debut_batch + batch_size, num_files)
         batch_files = fichiers[debut_batch:fin]
-        thread = MultiThread("Thread-" + str(i + 1), batch_files, dossier_source, dossier_destination, type)
+        thread = MultiThread(
+            "Thread-" + str(i + 1),
+            batch_files,
+            dossier_source,
+            dossier_destination,
+            type,
+        )
         threads.append(thread)
 
     # Démarrer les threads
@@ -37,10 +45,11 @@ def conversion_manager(type, dossier_source, dossier_destination):
     # Attendre la fin de chaque thread
     for thread in threads:
         thread.join()
-
+    write_config_file(dossier_destination, fichiers)
     # Calculer le temps écoulé
     temps_ecoule_total = time.time() - debut_total
     print("La conversion a pris", temps_ecoule_total, "secondes.")
+
 
 if __name__ == "__main__":
     # Type de traitement à effectuer
