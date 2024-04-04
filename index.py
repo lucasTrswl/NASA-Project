@@ -50,6 +50,11 @@ def afficher_images_dossier(dossier):
         images_photo.append(img)
 
     afficher_image(0)
+    
+def on_image_click(event):
+    global fullscreen
+    toggle_fullscreen()
+    afficher_image(current_index)
 
 def afficher_image(index):
     canvas.delete("all")
@@ -188,3 +193,4 @@ canvas.bind("<Button-1>", on_image_click)
 fullscreen = False
 
 fenetre.mainloop()
+    
