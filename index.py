@@ -59,14 +59,34 @@ def afficher_image(index):
     canvas.delete("all")
     canvas.create_image(0, 0, anchor="nw", image=images_photo[index])
 
-    # Affichage du nom de l'image en haut à gauche
-    image_name = os.path.basename(os.path.splitext(os.listdir(dossier)[index])[0])
-    canvas.create_text(10, 10, anchor="nw", text=image_name, fill="white", font=('Helvetica', 12, 'bold'))
+    global image_name_text
+    if show_image_name:  # Vérifier l'état du bouton
+        # Affichage du nom de l'image en haut à gauche
+        image_name = os.path.basename(os.path.splitext(os.listdir(dossier)[index])[0])
+        image_name_text = canvas.create_text(10, 10, anchor="nw", text=image_name, fill="white", font=('Helvetica', int(-10 * fenetre.winfo_height() / 800), 'bold'))
+
+def toggle_image_name():
+    global show_image_name
+    show_image_name = not show_image_name
+
+    if show_image_name:
+        bouton_toggle.config(text="Masquer Nom Image")
+        afficher_image(current_index)
+    else:
+        bouton_toggle.config(text="Afficher Nom Image")
+        canvas.delete(image_name_text)
+
+def on_resize(event):
+    # Appelé lors du redimensionnement de la fenêtre
+    # Ajuste la taille de la police en fonction de la taille de la fenêtre
+    new_font_size = int(-10 * event.height / 800)
+    canvas.itemconfig(image_name_text, font=('Helvetica', new_font_size, 'bold'))
 
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
 fenetre.geometry("800x800")
 fenetre.configure(bg=couleur_blanc)
+fenetre.bind("<Configure>", on_resize)  # Appeler on_resize lors du redimensionnement
 
 style = ttk.Style()
 
@@ -121,19 +141,29 @@ def on_configure(event):
 
 canvas_frame.bind("<Configure>", on_configure)
 
-#Passer à l'image suivante
+# Passer à l'image suivante
 def suivante():
     global current_index
     current_index = (current_index + 1) % len(images_photo)
     afficher_image(current_index)
 
+# Passer à l'image précédente
 def precedente():
     global current_index
     current_index = (current_index - 1) % len(images_photo)
     afficher_image(current_index)
 
-bouton_suivant = ttk.Button(content_frame, text="Suivant", command=suivante)
+# Créer les boutons pour passer aux images suivante et précédente
 bouton_precedent = ttk.Button(content_frame, text="Précédent", command=precedente)
+bouton_precedent.pack(side=tk.LEFT, padx=10)
+
+bouton_suivant = ttk.Button(content_frame, text="Suivant", command=suivante)
+bouton_suivant.pack(side=tk.LEFT, padx=10)
+
+# Bouton pour afficher/masquer le nom de l'image
+show_image_name = True
+bouton_toggle = ttk.Checkbutton(content_frame, text="Masquer Nom Image", command=toggle_image_name)
+bouton_toggle.pack(pady=10)
 
 footer_frame = ttk.Frame(fenetre)
 footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
@@ -142,5 +172,6 @@ bouton = ttk.Button(footer_frame, text="Cliquez ici", command=afficher_message)
 bouton.pack(pady=10)
 
 current_index = 0
+image_name_text = None  # Pour stocker l'ID du texte du nom de l'image
 
 fenetre.mainloop()
