@@ -167,6 +167,11 @@ def on_mouse_wheel(event):
     else:
         precedente()
 
+def toggle_fullscreen(event=None):
+    global fullscreen
+    fullscreen = not fullscreen
+    fenetre.attributes('-fullscreen', fullscreen)
+
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
 fenetre.geometry("800x800")
@@ -299,5 +304,14 @@ previous_height = fenetre.winfo_height()
 
 
 fenetre.bind("<Configure>", on_window_resize)
+
+# Passer en plein écran lorsqu'on clique sur une image
+def on_image_click(event):
+    global fullscreen
+    toggle_fullscreen()
+
+canvas.bind("<Button-1>", on_image_click)
+
+fullscreen = False
 
 fenetre.mainloop()
