@@ -315,3 +315,4 @@ canvas.bind("<Button-1>", on_image_click)
 fullscreen = False
 
 fenetre.mainloop()
+    
