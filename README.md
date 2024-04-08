@@ -32,12 +32,3 @@ pip install name_package
 ```
 pip freeze 
 ```
-## Format files
-- all files
-```
-python format.py 
-```
-- one file
-```
-python format.py name_file
-```
