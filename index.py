@@ -5,6 +5,14 @@ from tkinter import ttk, filedialog, messagebox, PhotoImage
 liste_projets = []
 
 def menu_selection(event=None):
+
+    """
+    Fonction pour gérer la sélection dans le menu déroulant.
+
+    Args:
+
+        event(Event, optional): Évènement déclencheur de la fonction. Par défaut, None.
+    """
     selected_item = selected_option.get()
     print(f"Menu sélectionné : {selected_item}")
     if selected_item == "Créer un nouveau projet":
@@ -45,6 +53,11 @@ def menu_selection(event=None):
         frame_projets.pack_forget()
 
 def importer_dossier():
+
+    """
+    Fonction pour importer un dossier et l'ajouter à la liste ds projets.
+
+    """
     global dossier
     dossier = filedialog.askdirectory()
     if dossier:
@@ -58,6 +71,14 @@ def importer_dossier():
         print("Aucun dossier sélectionné.")
 
 def clear_frame(frame):
+
+    """
+    Fonction pour effacer tous les widgets d'un cadre.
+
+    Args:
+        frame (Frame): Cadre dont les widgets doivent être effacés.
+    
+    """
     for widget in frame.winfo_children():
         widget.destroy()
 
