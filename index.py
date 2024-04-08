@@ -165,8 +165,8 @@ bouton_importer_dossier = ttk.Button(
 )
 
 
-footer_frame = ttk.Frame(fenetre)
-footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
+# footer_frame = ttk.Frame(fenetre)
+# footer_frame.pack(side=tk.BOTTOM, fill=tk.X)
 
 
 dossier = ""
