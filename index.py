@@ -1,6 +1,7 @@
 import os
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, PhotoImage
+from modules.progressBar import start_progress, update_progress, stop_progress
 
 liste_projets = []
 
@@ -56,8 +57,8 @@ def importer_dossier():
 
     """
     Fonction pour importer un dossier et l'ajouter à la liste ds projets.
-
     """
+
     global dossier
     dossier = filedialog.askdirectory()
     if dossier:
@@ -65,10 +66,17 @@ def importer_dossier():
         if not nom_dossier:
             nom_dossier = os.path.basename(dossier)
         liste_projets.append(nom_dossier)
+        progress_bar = start_progress(content_frame, color="#F550E4")
+        for i in range(101):
+            update_progress(progress_bar, i)
+            fenetre.update_idletasks()
+            fenetre.after(10)
+        stop_progress(progress_bar)
         messagebox.showinfo("Succès", "Dossier importé avec succès")
         print(f"Dossier importé avec succès : {dossier}")
     else:
         print("Aucun dossier sélectionné.")
+
 
 def clear_frame(frame):
 
