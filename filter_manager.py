@@ -2,10 +2,6 @@ import os
 import time
 from modules.thread import MultiThread
 
-import os
-import time
-from modules.thread import MultiThread
-
 def filter_manager(type, dossier_source, dossier_destination):
     """
     Fonction principale pour coordonner la conversion des fichiers en utilisant des threads.
