@@ -9,7 +9,7 @@ class MultiThread(threading.Thread):
     - threading.Thread: Classe de base pour créer des threads.
     """
 
-    def __init__(self, name, files, dossier_source, dossier_destination):
+    def __init__(self, name, files, dossier_source, dossier_destination, type):
         """
         Initialisation de la classe MultiThread.
 
@@ -25,6 +25,7 @@ class MultiThread(threading.Thread):
         self.files = files
         self.dossier_source = dossier_source
         self.dossier_destination = dossier_destination
+        self.type = type
 
     def run(self):
         """
@@ -37,5 +38,12 @@ class MultiThread(threading.Thread):
         print("Starting " + self.name)
         for fichier in self.files:
             if fichier.endswith('.tif'):
-                convertir_fichier(fichier, self.dossier_source, self.dossier_destination)
+                if self.type == 'convert':
+                    convertir_fichier(fichier, self.dossier_source, self.dossier_destination)
+                elif self.type == 'filter':
+                    filter(fichier, self.dossier_source, self.dossier_destination)
+                else:
+                    print("Type de traitement non reconnu.")
+            else:
+                print(f"Le fichier {fichier} n'est pas un fichier TIFF.")
         print("Exiting", self.name)
