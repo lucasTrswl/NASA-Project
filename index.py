@@ -4,16 +4,17 @@ from modules.progressBar import start_progress, update_progress, stop_progress
 from tkinter import ttk, filedialog, messagebox, PhotoImage
 from conversion_manager import conversion_manager
 from modules.interface import show_folders, configuration_canvas
-from global_style import (
-    couleur_blanc,
-)
+from global_style import couleur_blanc, SETTINGS_STYLE
 
 WIDTH_WINDOW = 800
 
 liste_projets = []
 
+
 def afficher_message():
     print("Bonjour, Tkinter!")
+
+
 from modules.progressBar import start_progress, update_progress, stop_progress
 
 
@@ -56,7 +57,11 @@ def importer_dossier():
     dossier = filedialog.askdirectory()
     if dossier:
         print(os.listdir(dossier))
-        tif_files = [fichier for fichier in os.listdir(dossier) if fichier.endswith(".tif")]
+        tif_files = [
+            fichier
+            for fichier in os.listdir(dossier)
+            if fichier.endswith(".tif")
+        ]
         if not tif_files:
             return
 
@@ -71,10 +76,13 @@ def importer_dossier():
             fenetre.after(10)
         stop_progress(progress_bar)
         messagebox.showinfo("Succès", "Dossier importé avec succès")
-        creer_nouveau_projet(nom_dossier)  # Créer un nouveau projet avec le nom du dossier
+        creer_nouveau_projet(
+            nom_dossier
+        )  # Créer un nouveau projet avec le nom du dossier
         print(f"Dossier importé avec succès : {dossier}")
     else:
         print("Aucun dossier sélectionné.")
+
 
 def clear_frame(frame):
     """
@@ -88,7 +96,6 @@ def clear_frame(frame):
         widget.destroy()
 
 
-
 def creer_nouveau_projet(nom_dossier):
     """
     Fonction pour créer un nouveau projet dans le dossier 'Projets'.
@@ -96,22 +103,29 @@ def creer_nouveau_projet(nom_dossier):
     Args:
         nom_dossier (str): Nom du dossier à créer comme nouveau projet.
     """
-    chemin_projets = os.path.join(os.getcwd(), "Mes projets")  # Chemin du dossier 'Projets'
+    chemin_projets = os.path.join(
+        os.getcwd(), "Mes projets"
+    )  # Chemin du dossier 'Projets'
     nouveau_dossier = os.path.join(chemin_projets, nom_dossier)
-    
-    tif_files = [fichier for fichier in os.listdir(dossier) if fichier.endswith(".tif")]
+
+    tif_files = [
+        fichier for fichier in os.listdir(dossier) if fichier.endswith(".tif")
+    ]
     if not tif_files:
-        messagebox.showerror("Erreur", "Le dossier ne contient aucun fichier .tif.")
+        messagebox.showerror(
+            "Erreur", "Le dossier ne contient aucun fichier .tif."
+        )
 
         print(f"Le dossier '{nom_dossier}' ne contient aucun fichier .tif.")
         return
-    
+
     try:
         os.makedirs(nouveau_dossier)  # Créer le nouveau dossier dans 'Projets'
         messagebox.showinfo("Succès", "Dossier importé avec succès")
         print(f"Nouveau projet créé : {nouveau_dossier}")
     except FileExistsError:
         print(f"Le dossier '{nom_dossier}' existe déjà dans 'Projets'.")
+
 
 def importer_dossier():
     """
@@ -123,48 +137,24 @@ def importer_dossier():
         nom_dossier = champ_saisie.get()
         if not nom_dossier:
             nom_dossier = os.path.basename(dossier)
-        creer_nouveau_projet(nom_dossier)  # Créer un nouveau projet avec le nom du dossier
+        creer_nouveau_projet(
+            nom_dossier
+        )  # Créer un nouveau projet avec le nom du dossier
         print(f"Dossier importé avec succès : {dossier}")
     else:
         print("Aucun dossier sélectionné.")
+
 
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
 fenetre.geometry("800x800")
 fenetre.configure(bg="#FFFFFF")
+# theme
 style = ttk.Style()
-
-style.theme_create(
-    "gendarmerie_style",
-    parent="alt",
-    settings={
-        "TLabel": {"configure": {"foreground": "#0055A4", "background": "#FFFFFF", "font": ('Helvetica', 12)}},
-        "TEntry": {
-            "configure": {"foreground": "#000000", "font": ("Helvetica", 12)}
-        },
-         "TButton": {"configure": {"foreground": "#FFFFFF", "background": "#0055A4", "font": ('Helvetica', 12, 'bold')}},
-        "TFrame": {"configure": {"background": "#FFFFFF"}},
-        "TCombobox": {
-            "configure": {
-                "foreground": "#000000",
-                "background": "#FFFFFF",
-                "font": ("Helvetica", 12),
-            }
-        },
-        "TCombobox.Border": {
-            "configure": {"foreground": "#0055A4", "background": "#0055A4"}
-        },
-        "TCombobox.field": {
-            "configure": {
-                "foreground": "#000000",
-                "background": "#FFFFFF",
-                "font": ("Helvetica", 12),
-            }
-        },
-    },
-)
-
+style.theme_create("gendarmerie_style", parent="alt", settings=SETTINGS_STYLE)
 style.theme_use("gendarmerie_style")
+
+# header
 header_frame = ttk.Frame(fenetre)
 header_frame.pack(side=tk.TOP, fill=tk.X)
 
