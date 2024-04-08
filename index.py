@@ -52,9 +52,7 @@ def afficher_images_dossier(dossier):
     afficher_image(0)
     
 def on_image_click(event):
-    global fullscreen
-    toggle_fullscreen()
-    afficher_image(current_index)
+    afficher_image_plein_ecran(current_index)
 
 def afficher_image(index):
     canvas.delete("all")
@@ -103,6 +101,36 @@ def toggle_fullscreen(event=None):
     global fullscreen
     fullscreen = not fullscreen
     fenetre.attributes('-fullscreen', fullscreen)
+
+def afficher_image_plein_ecran(index):
+    if images_photo:
+        img = Image.open(os.path.join(dossier, os.listdir(dossier)[index]))
+        screen_width = fenetre.winfo_screenwidth()
+        screen_height = fenetre.winfo_screenheight()
+
+        # Redimensionner l'image si elle est trop grande pour l'écran
+        if img.width > screen_width or img.height > screen_height:
+            ratio_width = screen_width / img.width
+            ratio_height = screen_height / img.height
+            ratio = min(ratio_width, ratio_height)
+            new_width = int(img.width * ratio)
+            new_height = int(img.height * ratio)
+            img = img.resize((new_width, new_height))
+
+        fullscreen_image = tk.Toplevel(fenetre)
+        fullscreen_image.title("Image en plein écran")
+        fullscreen_image.attributes('-fullscreen', True)
+
+        img_tk = ImageTk.PhotoImage(img)
+
+        canvas_fullscreen = tk.Canvas(fullscreen_image, bd=0, highlightthickness=0, width=screen_width, height=screen_height)
+        canvas_fullscreen.pack(fill=tk.BOTH, expand=True)
+
+        canvas_fullscreen.create_image(screen_width // 2, screen_height // 2, image=img_tk)
+        canvas_fullscreen.image = img_tk
+
+        # Fermer l'image en plein écran lorsqu'on clique dessus
+        canvas_fullscreen.bind("<Button-1>", lambda event: fullscreen_image.destroy())
 
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
@@ -185,12 +213,10 @@ image_name_text = None  # Pour stocker l'ID du texte du nom de l'image
 
 # Passer en plein écran lorsqu'on clique sur une image
 def on_image_click(event):
-    global fullscreen
-    toggle_fullscreen()
+    afficher_image_plein_ecran(current_index)
 
 canvas.bind("<Button-1>", on_image_click)
 
 fullscreen = False
 
 fenetre.mainloop()
-    
