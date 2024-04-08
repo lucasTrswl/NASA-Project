@@ -73,6 +73,38 @@ def clear_frame(frame):
         widget.destroy()
 
 
+
+def creer_nouveau_projet(nom_dossier):
+    """
+    Fonction pour créer un nouveau projet dans le dossier 'Projets'.
+
+    Args:
+        nom_dossier (str): Nom du dossier à créer comme nouveau projet.
+    """
+    chemin_projets = os.path.join(os.getcwd(), "Mes projets")  # Chemin du dossier 'Projets'
+    nouveau_dossier = os.path.join(chemin_projets, nom_dossier)
+    try:
+        os.makedirs(nouveau_dossier)  # Créer le nouveau dossier dans 'Projets'
+        print(f"Nouveau projet créé : {nouveau_dossier}")
+    except FileExistsError:
+        print(f"Le dossier '{nom_dossier}' existe déjà dans 'Projets'.")
+
+def importer_dossier():
+    """
+    Fonction pour importer un dossier et l'ajouter à la liste des projets.
+    """
+    global dossier
+    dossier = filedialog.askdirectory()
+    if dossier:
+        nom_dossier = champ_saisie.get()
+        if not nom_dossier:
+            nom_dossier = os.path.basename(dossier)
+        creer_nouveau_projet(nom_dossier)  # Créer un nouveau projet avec le nom du dossier
+        messagebox.showinfo("Succès", "Dossier importé avec succès")
+        print(f"Dossier importé avec succès : {dossier}")
+    else:
+        print("Aucun dossier sélectionné.")
+
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
 fenetre.geometry("800x800")
@@ -83,11 +115,11 @@ style.theme_create(
     "gendarmerie_style",
     parent="alt",
     settings={
-        # "TLabel": {"configure": {"foreground": "#0055A4", "background": "#FFFFFF", "font": ('Helvetica', 12)}},
+        "TLabel": {"configure": {"foreground": "#0055A4", "background": "#FFFFFF", "font": ('Helvetica', 12)}},
         "TEntry": {
             "configure": {"foreground": "#000000", "font": ("Helvetica", 12)}
         },
-        # "TButton": {"configure": {"foreground": "#FFFFFF", "background": "#0055A4", "font": ('Helvetica', 12, 'bold')}},
+         "TButton": {"configure": {"foreground": "#FFFFFF", "background": "#0055A4", "font": ('Helvetica', 12, 'bold')}},
         "TFrame": {"configure": {"background": "#FFFFFF"}},
         "TCombobox": {
             "configure": {
