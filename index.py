@@ -46,19 +46,24 @@ def menu_selection(event=None):
 
 def importer_dossier():
     """
-    Fonction pour importer un dossier et l'ajouter à la liste ds projets.
-
+    Fonction pour importer un dossier et l'ajouter à la liste des projets.
     """
     global dossier
     dossier = filedialog.askdirectory()
     if dossier:
+        print(os.listdir(dossier))
+        tif_files = [fichier for fichier in os.listdir(dossier) if fichier.endswith(".tif")]
+        if not tif_files:
+            return
+
         nom_dossier = champ_saisie.get()
         if not nom_dossier:
             nom_dossier = os.path.basename(dossier)
-        messagebox.showinfo("Succès", "Dossier importé avec succès")
+        creer_nouveau_projet(nom_dossier)  # Créer un nouveau projet avec le nom du dossier
         print(f"Dossier importé avec succès : {dossier}")
     else:
         print("Aucun dossier sélectionné.")
+
 
 
 def clear_frame(frame):
@@ -83,8 +88,17 @@ def creer_nouveau_projet(nom_dossier):
     """
     chemin_projets = os.path.join(os.getcwd(), "Mes projets")  # Chemin du dossier 'Projets'
     nouveau_dossier = os.path.join(chemin_projets, nom_dossier)
+    
+    tif_files = [fichier for fichier in os.listdir(dossier) if fichier.endswith(".tif")]
+    if not tif_files:
+        messagebox.showerror("Erreur", "Le dossier ne contient aucun fichier .tif.")
+
+        print(f"Le dossier '{nom_dossier}' ne contient aucun fichier .tif.")
+        return
+    
     try:
         os.makedirs(nouveau_dossier)  # Créer le nouveau dossier dans 'Projets'
+        messagebox.showinfo("Succès", "Dossier importé avec succès")
         print(f"Nouveau projet créé : {nouveau_dossier}")
     except FileExistsError:
         print(f"Le dossier '{nom_dossier}' existe déjà dans 'Projets'.")
@@ -100,7 +114,6 @@ def importer_dossier():
         if not nom_dossier:
             nom_dossier = os.path.basename(dossier)
         creer_nouveau_projet(nom_dossier)  # Créer un nouveau projet avec le nom du dossier
-        messagebox.showinfo("Succès", "Dossier importé avec succès")
         print(f"Dossier importé avec succès : {dossier}")
     else:
         print("Aucun dossier sélectionné.")
