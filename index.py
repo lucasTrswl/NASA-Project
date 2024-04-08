@@ -1,6 +1,7 @@
 import os
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
+from modules.progressBar import start_progress, update_progress, stop_progress
+from tkinter import ttk, filedialog, messagebox, PhotoImage
 from conversion_manager import conversion_manager
 from modules.interface import show_folders, configuration_canvas
 from global_style import (
@@ -74,9 +75,6 @@ def importer_dossier():
         print(f"Dossier importé avec succès : {dossier}")
     else:
         print("Aucun dossier sélectionné.")
-
-
-
 
 def clear_frame(frame):
     """
