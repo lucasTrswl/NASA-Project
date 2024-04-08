@@ -202,6 +202,80 @@ def afficher_image_plein_ecran(index):
         # Fermer l'image en plein écran lorsqu'on clique dessus
         canvas_fullscreen.bind("<Button-1>", lambda event: fullscreen_image.destroy())
 
+    global image_name_text
+    if show_image_name:  # Vérifier l'état du bouton
+        # Affichage du nom de l'image en haut à gauche
+        image_name = os.path.basename(os.path.splitext(os.listdir(dossier)[index])[0])
+        image_name_text = canvas.create_text(10, 10, anchor="nw", text=image_name, fill="white", font=('Helvetica', int(-10 * fenetre.winfo_height() / 800), 'bold'))
+
+def toggle_image_name():
+    global show_image_name
+    show_image_name = not show_image_name
+
+    if show_image_name:
+        bouton_toggle.config(text="Masquer Nom Image")
+        afficher_image(current_index)
+    else:
+        bouton_toggle.config(text="Afficher Nom Image")
+        canvas.delete(image_name_text)
+
+def on_resize(event):
+    # Appelé lors du redimensionnement de la fenêtre
+    # Ajuste la taille de la police en fonction de la taille de la fenêtre
+    new_font_size = int(-10 * event.height / 800)
+    canvas.itemconfig(image_name_text, font=('Helvetica', new_font_size, 'bold'))
+
+def suivante(event=None):
+    global current_index
+    current_index = (current_index + 1) % len(images_photo)
+    afficher_image(current_index)
+
+def precedente(event=None):
+    global current_index
+    current_index = (current_index - 1) % len(images_photo)
+    afficher_image(current_index)
+
+def on_mouse_wheel(event):
+    if event.delta < 0:
+        suivante()
+    else:
+        precedente()
+
+def toggle_fullscreen(event=None):
+    global fullscreen
+    fullscreen = not fullscreen
+    fenetre.attributes('-fullscreen', fullscreen)
+
+def afficher_image_plein_ecran(index):
+    if images_photo:
+        img = Image.open(os.path.join(dossier, os.listdir(dossier)[index]))
+        screen_width = fenetre.winfo_screenwidth()
+        screen_height = fenetre.winfo_screenheight()
+
+        # Redimensionner l'image si elle est trop grande pour l'écran
+        if img.width > screen_width or img.height > screen_height:
+            ratio_width = screen_width / img.width
+            ratio_height = screen_height / img.height
+            ratio = min(ratio_width, ratio_height)
+            new_width = int(img.width * ratio)
+            new_height = int(img.height * ratio)
+            img = img.resize((new_width, new_height))
+
+        fullscreen_image = tk.Toplevel(fenetre)
+        fullscreen_image.title("Image en plein écran")
+        fullscreen_image.attributes('-fullscreen', True)
+
+        img_tk = ImageTk.PhotoImage(img)
+
+        canvas_fullscreen = tk.Canvas(fullscreen_image, bd=0, highlightthickness=0, width=screen_width, height=screen_height)
+        canvas_fullscreen.pack(fill=tk.BOTH, expand=True)
+
+        canvas_fullscreen.create_image(screen_width // 2, screen_height // 2, image=img_tk)
+        canvas_fullscreen.image = img_tk
+
+        # Fermer l'image en plein écran lorsqu'on clique dessus
+        canvas_fullscreen.bind("<Button-1>", lambda event: fullscreen_image.destroy())
+
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
 fenetre.geometry("800x800")
