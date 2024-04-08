@@ -12,6 +12,7 @@ WIDTH_WINDOW = 800
 
 def afficher_message():
     print("Bonjour, Tkinter!")
+from modules.progressBar import start_progress, update_progress, stop_progress
 
 
 def menu_selection(event=None):
@@ -48,6 +49,7 @@ def importer_dossier():
     """
     Fonction pour importer un dossier et l'ajouter à la liste des projets.
     """
+
     global dossier
     dossier = filedialog.askdirectory()
     if dossier:
@@ -59,10 +61,19 @@ def importer_dossier():
         nom_dossier = champ_saisie.get()
         if not nom_dossier:
             nom_dossier = os.path.basename(dossier)
+        liste_projets.append(nom_dossier)
+        progress_bar = start_progress(content_frame, color="#F550E4")
+        for i in range(101):
+            update_progress(progress_bar, i)
+            fenetre.update_idletasks()
+            fenetre.after(10)
+        stop_progress(progress_bar)
+        messagebox.showinfo("Succès", "Dossier importé avec succès")
         creer_nouveau_projet(nom_dossier)  # Créer un nouveau projet avec le nom du dossier
         print(f"Dossier importé avec succès : {dossier}")
     else:
         print("Aucun dossier sélectionné.")
+
 
 
 
