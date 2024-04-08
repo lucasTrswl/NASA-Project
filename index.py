@@ -10,6 +10,7 @@ from global_style import (
 
 WIDTH_WINDOW = 800
 
+liste_projets = []
 
 def afficher_message():
     print("Bonjour, Tkinter!")
