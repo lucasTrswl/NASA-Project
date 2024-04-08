@@ -56,5 +56,5 @@ if __name__ == "__main__":
     type = "convert"
     # Chemins des dossiers source et destination
     dossier_source = "../ECHO-DOT"
-    dossier_destination = "../MultiThread-Converted-ECHO-DOT"
+    dossier_destination = "project/MultiThread-Converted-ECHO-DOT"
     conversion_manager(type, dossier_source, dossier_destination)
