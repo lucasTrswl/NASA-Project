@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import os
-from tqdm import tqdm
 import time
 
 def filter_images(filename, folder_source, folder_destination):
