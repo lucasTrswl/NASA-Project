@@ -1,5 +1,7 @@
 import threading
 from .convert import convertir_fichier
+from .filter import filter_images
+
 
 class MultiThread(threading.Thread):
     """
@@ -9,7 +11,7 @@ class MultiThread(threading.Thread):
     - threading.Thread: Classe de base pour créer des threads.
     """
 
-    def __init__(self, name, files, dossier_source, dossier_destination, type):
+    def __init__(self, name, files, dossier_source, dossier_destination, type, selected=[]):
         """
         Initialisation de la classe MultiThread.
 
@@ -26,6 +28,7 @@ class MultiThread(threading.Thread):
         self.dossier_source = dossier_source
         self.dossier_destination = dossier_destination
         self.type = type
+        self.selected = selected
 
     def run(self):
         """
@@ -41,7 +44,9 @@ class MultiThread(threading.Thread):
                 if self.type == 'convert':
                     convertir_fichier(fichier, self.dossier_source, self.dossier_destination)
                 elif self.type == 'filter':
-                    filter(fichier, self.dossier_source, self.dossier_destination)
+                    file = filter_images(fichier, self.dossier_source, self.dossier_destination)
+                    if file:
+                        self.selected.append(file)
                 else:
                     print("Type de traitement non reconnu.")
             else:
