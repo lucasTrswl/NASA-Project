@@ -1,13 +1,10 @@
 import os
-import time
 from modules.thread import MultiThread
 
 def filter_manager(type, dossier_source, dossier_destination):
     """
     Fonction principale pour coordonner la conversion des fichiers en utilisant des threads.
     """
-    debut_total = time.time()
-
     if not os.path.exists(dossier_destination):
         os.makedirs(dossier_destination)
 
@@ -31,22 +28,4 @@ def filter_manager(type, dossier_source, dossier_destination):
     for thread in threads:
         thread.join()
 
-    temps_ecoule_total = time.time() - debut_total
-    print("\nLa conversion a pris", temps_ecoule_total, "secondes.")
     return selected
-
-# if __name__ == "__main__":
-#     # Définir le type de traitement à effectuer : 'convert' ou 'filter'
-#     type = "filter"
-#     print("Type de traitement:", type)
-
-#     # Chemins des dossiers source et destination
-#     dossier_source = "../img_source/ECHO-DOT"
-#     # dossier_source = "../MultiThread-Converted-ECHO-DOT"
-#     # dossier_source = "../uSD"
-#     # dossier_source = '../MultiThread-Converted-uSD'
-
-#     dossier_destination = "../filtered_images"
-    
-#     # filter_manager(type, dossier_source, dossier_destination)
-#     print(filter_manager(type, dossier_source, dossier_destination))
