@@ -1,17 +1,26 @@
 import threading
 from .convert import convertir_fichier
 from .filter import filter_images
+from .utils import is_valid_image
 
 
 class MultiThread(threading.Thread):
     """
     Extension de la classe Threading utilisée pour le traitement multitâche des fichiers.
-    
+
     Params:
     - threading.Thread: Classe de base pour créer des threads.
     """
 
-    def __init__(self, name, files, dossier_source, dossier_destination, type, selected=[]):
+    def __init__(
+        self,
+        name,
+        files,
+        dossier_source,
+        dossier_destination,
+        type,
+        selected=[],
+    ):
         """
         Initialisation de la classe MultiThread.
 
@@ -40,11 +49,18 @@ class MultiThread(threading.Thread):
         """
         print("Starting " + self.name)
         for fichier in self.files:
-            if fichier.endswith('.tif'):
-                if self.type == 'convert':
-                    convertir_fichier(fichier, self.dossier_source, self.dossier_destination)
-                elif self.type == 'filter':
-                    file = filter_images(fichier, self.dossier_source, self.dossier_destination)
+            if (
+                fichier.endswith(".tif")
+                and is_valid_image(self.dossier_source, fichier) == True
+            ):
+                if self.type == "convert":
+                    convertir_fichier(
+                        fichier, self.dossier_source, self.dossier_destination
+                    )
+                elif self.type == "filter":
+                    file = filter_images(
+                        fichier, self.dossier_source, self.dossier_destination
+                    )
                     if file:
                         self.selected.append(file)
                 else:
