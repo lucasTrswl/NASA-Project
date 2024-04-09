@@ -93,33 +93,24 @@ def importer_dossier():
         if not nom_dossier:
             nom_dossier = os.path.basename(dossier)
 
-        # # Copier les fichiers .tif valides du dossier sélectionné vers le nouveau dossier
-        # fichiers_tif = [fichier for fichier in os.listdir(dossier) if fichier.lower().endswith(".tif")]
-        # fichiers_copiés = 0
-        # for fichier_tif in fichiers_tif:
-        #     chemin_source = os.path.join(dossier, fichier_tif)
-        #     chemin_nouveau_dossier = os.path.join(os.getcwd(), "Mes projets", nom_dossier)
-        #     os.makedirs(chemin_nouveau_dossier, exist_ok=True)
-        #     chemin_destination = os.path.join(chemin_nouveau_dossier, fichier_tif)
-        #     try:
-        #         # Vérifier si le fichier est une image TIFF valide
-        #         Image.open(chemin_source).verify()
-        #         shutil.copy(chemin_source, chemin_destination)
-        #         fichiers_copiés += 1
-        #     except (IOError, SyntaxError) as e:
-        #         print(f"Le fichier {fichier_tif} n'est pas un fichier TIFF valide.")
-
-        # Convertir les fichiers avec conversion_manager 
-        conversion_manager("convert", dossier, os.path.join(os.getcwd(), "Mes projets", nom_dossier))
-        # Filtrer les fichiers avec filter_manager
-        selected_files = filter_manager("filter", dossier, os.path.join(os.getcwd(), "Mes projets", nom_dossier))
-        print(selected_files)
-        # if fichiers_copiés > 0:
-        #     messagebox.showinfo("Succès", "Dossier importé avec succès")
-        #     print(f"{fichiers_copiés} fichiers ont été importés avec succès depuis : {dossier}")
-        # else:
-        #     messagebox.showinfo("Erreur", "Aucun fichier TIFF valide n'a été trouvé dans le dossier sélectionné.")
-        #     print("Aucun fichier TIFF valide n'a été trouvé dans le dossier sélectionné.")
+        # Vérifier si le dossier existe déjà
+        if os.path.exists(os.path.join(os.getcwd(), "Mes projets", nom_dossier)):
+            messagebox.showerror("Erreur", "Le dossier existe déjà.")
+            print(f"Le dossier '{nom_dossier}' existe déjà.")
+            return
+        
+        # Vérifier si le dossier contient des fichiers .tif avant de créer le projet
+        tif_files = [fichier for fichier in os.listdir(dossier) if fichier.endswith(".tif")]
+        if tif_files:
+            # Convertir les fichiers avec conversion_manager 
+            conversion_manager("convert", dossier, os.path.join(os.getcwd(), "Mes projets", nom_dossier))
+            # Filtrer les fichiers avec filter_manager
+            selected_files = filter_manager("filter", dossier, os.path.join(os.getcwd(), "Mes projets", nom_dossier))
+            if selected_files:
+                messagebox.showinfo("Succès", "Dossier importé avec succès")
+        else:
+            messagebox.showerror("Erreur", "Le dossier ne contient aucun fichier .tif.")
+            print(f"Le dossier '{nom_dossier}' ne contient aucun fichier .tif.")
     else:
         print("Aucun dossier sélectionné.")
         

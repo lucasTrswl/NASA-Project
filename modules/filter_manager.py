@@ -34,19 +34,3 @@ def filter_manager(type, dossier_source, dossier_destination):
     temps_ecoule_total = time.time() - debut_total
     print("\nLa conversion a pris", temps_ecoule_total, "secondes.")
     return selected
-
-# if __name__ == "__main__":
-#     # Définir le type de traitement à effectuer : 'convert' ou 'filter'
-#     type = "filter"
-#     print("Type de traitement:", type)
-
-#     # Chemins des dossiers source et destination
-#     dossier_source = "../img_source/ECHO-DOT"
-#     # dossier_source = "../MultiThread-Converted-ECHO-DOT"
-#     # dossier_source = "../uSD"
-#     # dossier_source = '../MultiThread-Converted-uSD'
-
-#     dossier_destination = "../filtered_images"
-    
-#     # filter_manager(type, dossier_source, dossier_destination)
-#     print(filter_manager(type, dossier_source, dossier_destination))
