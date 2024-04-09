@@ -1,4 +1,5 @@
-import os
+import io
+import os, cv2, numpy as np
 import tkinter as tk
 from tkinter import ttk
 from global_style import couleur_blanc, couleur_bleu, couleur_gris_clair
@@ -7,6 +8,15 @@ import textwrap
 from PIL import Image, ImageTk
 
 DIVIDE_WINDOW_WIDTH_BY = 120
+
+
+def is_valid_image(dossier_source, file_name):
+    try:
+        file_path = os.path.join(dossier_source, file_name)
+        Image.open(file_path).verify()
+        return True
+    except (IOError, SyntaxError):
+        return False
 
 
 def truncate_text(text, max_lines=2):
@@ -20,6 +30,7 @@ def truncate_text(text, max_lines=2):
     wrapped_text = wrapper.wrap(text)
     truncated_text = "\n".join(wrapped_text[:max_lines])
     return truncated_text
+
 
 def open_folder_window(folder):
     """
@@ -36,13 +47,12 @@ def open_folder_window(folder):
         image_paths = []
         for root, dirs, files in os.walk(folder):
             for file in files:
-                if file.endswith(('.tif', '.tiff')):
+                if file.endswith((".tif", ".tiff")):
                     image_paths.append(os.path.join(root, file))
         return image_paths
 
     # Récupérer la liste des chemins d'images dans le dossier et ses sous-dossiers
     image_paths = get_image_paths(folder)
-    print("Fichiers trouvés dans le dossier:", image_paths)  # Imprime les fichiers trouvés
 
     # Créer une liste d'images à partir des chemins récupérés
     images = []
@@ -51,7 +61,9 @@ def open_folder_window(folder):
         images.append(ImageTk.PhotoImage(image))
 
     if not images:  # Vérifier si la liste d'images est vide
-        ttk.Label(new_window, text="Aucune image trouvée dans ce dossier").pack()
+        ttk.Label(
+            new_window, text="Aucune image trouvée dans ce dossier"
+        ).pack()
         return
 
     # Créer un carrousel d'images
@@ -70,9 +82,13 @@ def open_folder_window(folder):
         image_label.configure(image=images[current_image_index])
 
     # Boutons pour passer à l'image précédente et suivante
-    prev_button = ttk.Button(new_window, text="Précédent", command=show_prev_image)
+    prev_button = ttk.Button(
+        new_window, text="Précédent", command=show_prev_image
+    )
     prev_button.pack(side=tk.LEFT)
-    next_button = ttk.Button(new_window, text="Suivant", command=show_next_image)
+    next_button = ttk.Button(
+        new_window, text="Suivant", command=show_next_image
+    )
     next_button.pack(side=tk.RIGHT)
 
 
@@ -109,7 +125,6 @@ def show_folders(frame, window_width):
         for folder in os.listdir(folder_path)
         if os.path.isdir(os.path.join(folder_path, folder))
     ]
-    print(os.listdir(folder_path))
     for widget in frame.winfo_children():
         widget.destroy()
 
@@ -124,12 +139,15 @@ def show_folders(frame, window_width):
             style="List.TButton",
             text=truncated_title_folder,
             image=photo_icon,
-            command=lambda folder=folder: open_folder_window(os.path.join(folder_path, folder)),
-  # Modifiez cette ligne
+            command=lambda folder=folder: open_folder_window(
+                os.path.join(folder_path, folder)
+            ),
+            # Modifiez cette ligne
         )
         folder_button.image = photo_icon
         ToolTip(folder_button, folder)
         folder_button.grid(row=row, column=column, padx=5, pady=5)
+
 
 def scroll_with_mousewheel_x(canvas):
     """
@@ -235,4 +253,3 @@ def configuration_canvas(canvas, scroll_x, scroll_y, scrollable_frame):
     canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
     scroll_x.lift()
     scroll_y.lift()
-

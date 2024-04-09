@@ -1,6 +1,4 @@
 import os
-import shutil
-from PIL import Image, ImageTk
 import tkinter as tk
 from modules.progressBar import start_progress, update_progress, stop_progress
 from tkinter import ttk, filedialog, messagebox, PhotoImage
@@ -58,53 +56,6 @@ def clear_frame(frame):
         widget.destroy()
 
 
-def creer_nouveau_projet(nom_dossier):
-    """
-    Fonction pour créer un nouveau projet dans le dossier 'Projets'.
-
-    Args:
-        nom_dossier (str): Nom du dossier à créer comme nouveau projet.
-    """
-    chemin_projets = os.path.join(
-        os.getcwd(), PATH_PROJECTS
-    )  # Chemin du dossier 'Projets'
-    nouveau_dossier = os.path.join(chemin_projets, nom_dossier)
-
-    tif_files = [
-        fichier for fichier in os.listdir(dossier) if fichier.endswith(".tif")
-    ]
-    if not tif_files:
-        messagebox.showerror(
-            "Erreur", "Le dossier ne contient aucun fichier .tif."
-        )
-
-        print(f"Le dossier '{nom_dossier}' ne contient aucun fichier .tif.")
-        return
-
-    try:
-        os.makedirs(nouveau_dossier)  # Créer le nouveau dossier dans 'Projets'
-
-        full_path_destination = os.path.join(chemin_projets, nom_dossier)
-        selectedImage = filter_manager(
-            "filter", dossier, full_path_destination
-        )
-        not_selected = [
-            file for file in os.listdir(dossier) if (file not in selectedImage)
-        ]
-        write_config_file(
-            full_path_destination,
-            {"name": nom_dossier},
-            "DEFAULT",
-            default=True,
-        )
-        write_config_file(full_path_destination, selectedImage, "SELECTED")
-        write_config_file(full_path_destination, not_selected, "NOT SELECTED")
-        messagebox.showinfo("Succès", "Dossier importé avec succès")
-        print(f"Nouveau projet créé : {nouveau_dossier}")
-    except FileExistsError:
-        print(f"Le dossier '{nom_dossier}' existe déjà dans 'Projets'.")
-
-
 def importer_dossier():
     global dossier
     dossier = filedialog.askdirectory()
@@ -112,38 +63,12 @@ def importer_dossier():
         nom_dossier = champ_saisie.get()
         if not nom_dossier:
             nom_dossier = os.path.basename(dossier)
-
-        # Copier les fichiers .tif valides du dossier sélectionné vers le nouveau dossier
-        fichiers_tif = [
-            fichier
-            for fichier in os.listdir(dossier)
-            if fichier.lower().endswith(".tif")
-        ]
-        fichiers_copiés = 0
-        for fichier_tif in fichiers_tif:
-            chemin_source = os.path.join(dossier, fichier_tif)
-            chemin_nouveau_dossier = os.path.join(
-                os.getcwd(), "Mes projets", nom_dossier
-            )
-            os.makedirs(chemin_nouveau_dossier, exist_ok=True)
-            chemin_destination = os.path.join(
-                chemin_nouveau_dossier, fichier_tif
-            )
-            try:
-                # Vérifier si le fichier est une image TIFF valide
-                Image.open(chemin_source).verify()
-                shutil.copy(chemin_source, chemin_destination)
-                fichiers_copiés += 1
-            except (IOError, SyntaxError) as e:
-                print(
-                    f"Le fichier {fichier_tif} n'est pas un fichier TIFF valide."
-                )
-
-        if fichiers_copiés > 0:
-            full_path_destination = os.path.join(PATH_PROJECTS, nom_dossier)
+        full_path_destination = os.path.join(PATH_PROJECTS, nom_dossier)
+        try:
             selectedImage = filter_manager(
                 "filter", dossier, full_path_destination
             )
+
             not_selected = [
                 file
                 for file in os.listdir(dossier)
@@ -159,18 +84,13 @@ def importer_dossier():
             write_config_file(
                 full_path_destination, not_selected, "NOT SELECTED"
             )
+            conversion_manager("convert", dossier, full_path_destination)
             messagebox.showinfo("Succès", "Dossier importé avec succès")
-            print(
-                f"{fichiers_copiés} fichiers ont été importés avec succès depuis : {dossier}"
-            )
-        else:
+        except Exception:
             messagebox.showinfo(
-                "Erreur",
-                "Aucun fichier TIFF valide n'a été trouvé dans le dossier sélectionné.",
+                "Succès", "L'import du dossier a été un echec ! "
             )
-            print(
-                "Aucun fichier TIFF valide n'a été trouvé dans le dossier sélectionné."
-            )
+
     else:
         print("Aucun dossier sélectionné.")
 

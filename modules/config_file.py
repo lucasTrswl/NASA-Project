@@ -14,8 +14,9 @@ def write_config_file(path_dir, data, category, default=False):
     if default == True:
         config[category] = data
     else:
-        for items in data:
-            config_object[items] = None
+        for items in sorted(data):
+            if items.endswith(".tif"):
+                config_object[items] = None
         config[category] = config_object
 
     with open(
