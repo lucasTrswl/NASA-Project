@@ -1,6 +1,4 @@
 import os
-import shutil
-from PIL import Image, ImageTk
 import tkinter as tk
 from modules.progressBar import start_progress, update_progress, stop_progress
 from tkinter import ttk, filedialog, messagebox, PhotoImage
@@ -56,53 +54,6 @@ def clear_frame(frame):
     """
     for widget in frame.winfo_children():
         widget.destroy()
-
-
-def creer_nouveau_projet(nom_dossier):
-    """
-    Fonction pour créer un nouveau projet dans le dossier 'Projets'.
-
-    Args:
-        nom_dossier (str): Nom du dossier à créer comme nouveau projet.
-    """
-    chemin_projets = os.path.join(
-        os.getcwd(), PATH_PROJECTS
-    )  # Chemin du dossier 'Projets'
-    nouveau_dossier = os.path.join(chemin_projets, nom_dossier)
-
-    tif_files = [
-        fichier for fichier in os.listdir(dossier) if fichier.endswith(".tif")
-    ]
-    if not tif_files:
-        messagebox.showerror(
-            "Erreur", "Le dossier ne contient aucun fichier .tif."
-        )
-
-        print(f"Le dossier '{nom_dossier}' ne contient aucun fichier .tif.")
-        return
-
-    try:
-        os.makedirs(nouveau_dossier)  # Créer le nouveau dossier dans 'Projets'
-
-        full_path_destination = os.path.join(chemin_projets, nom_dossier)
-        selectedImage = filter_manager(
-            "filter", dossier, full_path_destination
-        )
-        not_selected = [
-            file for file in os.listdir(dossier) if (file not in selectedImage)
-        ]
-        write_config_file(
-            full_path_destination,
-            {"name": nom_dossier},
-            "DEFAULT",
-            default=True,
-        )
-        write_config_file(full_path_destination, selectedImage, "SELECTED")
-        write_config_file(full_path_destination, not_selected, "NOT SELECTED")
-        messagebox.showinfo("Succès", "Dossier importé avec succès")
-        print(f"Nouveau projet créé : {nouveau_dossier}")
-    except FileExistsError:
-        print(f"Le dossier '{nom_dossier}' existe déjà dans 'Projets'.")
 
 
 def importer_dossier():
