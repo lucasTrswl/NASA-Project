@@ -5,14 +5,14 @@ import tkinter as tk
 from modules.progressBar import start_progress, update_progress, stop_progress
 from tkinter import ttk, filedialog, messagebox, PhotoImage
 from conversion_manager import conversion_manager
+from filter_manager import filter_manager
 from modules.interface import show_folders, configuration_canvas
-from global_style import (
-    couleur_blanc,
-)
+from modules.config_file import write_config_file
+from global_style import couleur_blanc, SETTINGS_STYLE
 from modules.progressBar import start_progress, update_progress, stop_progress
 
 WIDTH_WINDOW = 800
-
+PATH_PROJECTS = "Mes projets"
 liste_projets = []
 
 
@@ -46,7 +46,6 @@ def menu_selection(event=None):
         show_folders(scrollable_frame, fenetre.winfo_width())
 
 
-
 def clear_frame(frame):
     """
     Fonction pour effacer tous les widgets d'un cadre.
@@ -59,7 +58,6 @@ def clear_frame(frame):
         widget.destroy()
 
 
-
 def creer_nouveau_projet(nom_dossier):
     """
     Fonction pour créer un nouveau projet dans le dossier 'Projets'.
@@ -67,22 +65,29 @@ def creer_nouveau_projet(nom_dossier):
     Args:
         nom_dossier (str): Nom du dossier à créer comme nouveau projet.
     """
-    chemin_projets = os.path.join(os.getcwd(), "Mes projets")  # Chemin du dossier 'Projets'
+    chemin_projets = os.path.join(
+        os.getcwd(), "Mes projets"
+    )  # Chemin du dossier 'Projets'
     nouveau_dossier = os.path.join(chemin_projets, nom_dossier)
-    
-    tif_files = [fichier for fichier in os.listdir(dossier) if fichier.endswith(".tif")]
+
+    tif_files = [
+        fichier for fichier in os.listdir(dossier) if fichier.endswith(".tif")
+    ]
     if not tif_files:
-        messagebox.showerror("Erreur", "Le dossier ne contient aucun fichier .tif.")
+        messagebox.showerror(
+            "Erreur", "Le dossier ne contient aucun fichier .tif."
+        )
 
         print(f"Le dossier '{nom_dossier}' ne contient aucun fichier .tif.")
         return
-    
+
     try:
         os.makedirs(nouveau_dossier)  # Créer le nouveau dossier dans 'Projets'
         messagebox.showinfo("Succès", "Dossier importé avec succès")
         print(f"Nouveau projet créé : {nouveau_dossier}")
     except FileExistsError:
         print(f"Le dossier '{nom_dossier}' existe déjà dans 'Projets'.")
+
 
 def importer_dossier():
     global dossier
@@ -93,65 +98,74 @@ def importer_dossier():
             nom_dossier = os.path.basename(dossier)
 
         # Copier les fichiers .tif valides du dossier sélectionné vers le nouveau dossier
-        fichiers_tif = [fichier for fichier in os.listdir(dossier) if fichier.lower().endswith(".tif")]
+        fichiers_tif = [
+            fichier
+            for fichier in os.listdir(dossier)
+            if fichier.lower().endswith(".tif")
+        ]
         fichiers_copiés = 0
         for fichier_tif in fichiers_tif:
             chemin_source = os.path.join(dossier, fichier_tif)
-            chemin_nouveau_dossier = os.path.join(os.getcwd(), "Mes projets", nom_dossier)
+            chemin_nouveau_dossier = os.path.join(
+                os.getcwd(), "Mes projets", nom_dossier
+            )
             os.makedirs(chemin_nouveau_dossier, exist_ok=True)
-            chemin_destination = os.path.join(chemin_nouveau_dossier, fichier_tif)
+            chemin_destination = os.path.join(
+                chemin_nouveau_dossier, fichier_tif
+            )
             try:
                 # Vérifier si le fichier est une image TIFF valide
                 Image.open(chemin_source).verify()
                 shutil.copy(chemin_source, chemin_destination)
                 fichiers_copiés += 1
             except (IOError, SyntaxError) as e:
-                print(f"Le fichier {fichier_tif} n'est pas un fichier TIFF valide.")
+                print(
+                    f"Le fichier {fichier_tif} n'est pas un fichier TIFF valide."
+                )
 
         if fichiers_copiés > 0:
+            full_path_destination = os.path.join(PATH_PROJECTS, nom_dossier)
+            selectedImage = filter_manager(
+                "filter", dossier, full_path_destination
+            )
+            not_selected = [
+                file
+                for file in os.listdir(dossier)
+                if (file not in selectedImage)
+            ]
+            write_config_file(
+                full_path_destination,
+                {"name": nom_dossier},
+                "DEFAULT",
+                default=True,
+            )
+            write_config_file(full_path_destination, selectedImage, "SELECTED")
+            write_config_file(
+                full_path_destination, not_selected, "NOT SELECTED"
+            )
             messagebox.showinfo("Succès", "Dossier importé avec succès")
-            print(f"{fichiers_copiés} fichiers ont été importés avec succès depuis : {dossier}")
+            print(
+                f"{fichiers_copiés} fichiers ont été importés avec succès depuis : {dossier}"
+            )
         else:
-            messagebox.showinfo("Erreur", "Aucun fichier TIFF valide n'a été trouvé dans le dossier sélectionné.")
-            print("Aucun fichier TIFF valide n'a été trouvé dans le dossier sélectionné.")
+            messagebox.showinfo(
+                "Erreur",
+                "Aucun fichier TIFF valide n'a été trouvé dans le dossier sélectionné.",
+            )
+            print(
+                "Aucun fichier TIFF valide n'a été trouvé dans le dossier sélectionné."
+            )
     else:
         print("Aucun dossier sélectionné.")
-        
+
+
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
 fenetre.geometry("800x800")
 fenetre.configure(bg="#FFFFFF")
 style = ttk.Style()
 
-style.theme_create(
-    "gendarmerie_style",
-    parent="alt",
-    settings={
-        "TLabel": {"configure": {"foreground": "#0055A4", "background": "#FFFFFF", "font": ('Helvetica', 12)}},
-        "TEntry": {
-            "configure": {"foreground": "#000000", "font": ("Helvetica", 12)}
-        },
-         "TButton": {"configure": {"foreground": "#FFFFFF", "background": "#0055A4", "font": ('Helvetica', 12, 'bold')}},
-        "TFrame": {"configure": {"background": "#FFFFFF"}},
-        "TCombobox": {
-            "configure": {
-                "foreground": "#000000",
-                "background": "#FFFFFF",
-                "font": ("Helvetica", 12),
-            }
-        },
-        "TCombobox.Border": {
-            "configure": {"foreground": "#0055A4", "background": "#0055A4"}
-        },
-        "TCombobox.field": {
-            "configure": {
-                "foreground": "#000000",
-                "background": "#FFFFFF",
-                "font": ("Helvetica", 12),
-            }
-        },
-    },
-)
+style.theme_create("gendarmerie_style", parent="alt", settings=SETTINGS_STYLE)
 
 style.theme_use("gendarmerie_style")
 header_frame = ttk.Frame(fenetre)
