@@ -1,4 +1,6 @@
 import os
+import shutil
+from PIL import Image, ImageTk
 import tkinter as tk
 from modules.progressBar import start_progress, update_progress, stop_progress
 from tkinter import ttk, filedialog, messagebox, PhotoImage
@@ -7,14 +9,11 @@ from modules.interface import show_folders, configuration_canvas
 from global_style import (
     couleur_blanc,
 )
+from modules.progressBar import start_progress, update_progress, stop_progress
 
 WIDTH_WINDOW = 800
 
 liste_projets = []
-
-def afficher_message():
-    print("Bonjour, Tkinter!")
-from modules.progressBar import start_progress, update_progress, stop_progress
 
 
 def menu_selection(event=None):
@@ -47,34 +46,6 @@ def menu_selection(event=None):
         show_folders(scrollable_frame, fenetre.winfo_width())
 
 
-def importer_dossier():
-    """
-    Fonction pour importer un dossier et l'ajouter à la liste des projets.
-    """
-
-    global dossier
-    dossier = filedialog.askdirectory()
-    if dossier:
-        print(os.listdir(dossier))
-        tif_files = [fichier for fichier in os.listdir(dossier) if fichier.endswith(".tif")]
-        if not tif_files:
-            return
-
-        nom_dossier = champ_saisie.get()
-        if not nom_dossier:
-            nom_dossier = os.path.basename(dossier)
-        liste_projets.append(nom_dossier)
-        progress_bar = start_progress(content_frame, color="#F550E4")
-        for i in range(101):
-            update_progress(progress_bar, i)
-            fenetre.update_idletasks()
-            fenetre.after(10)
-        stop_progress(progress_bar)
-        messagebox.showinfo("Succès", "Dossier importé avec succès")
-        creer_nouveau_projet(nom_dossier)  # Créer un nouveau projet avec le nom du dossier
-        print(f"Dossier importé avec succès : {dossier}")
-    else:
-        print("Aucun dossier sélectionné.")
 
 def clear_frame(frame):
     """
@@ -114,20 +85,38 @@ def creer_nouveau_projet(nom_dossier):
         print(f"Le dossier '{nom_dossier}' existe déjà dans 'Projets'.")
 
 def importer_dossier():
-    """
-    Fonction pour importer un dossier et l'ajouter à la liste des projets.
-    """
     global dossier
     dossier = filedialog.askdirectory()
     if dossier:
         nom_dossier = champ_saisie.get()
         if not nom_dossier:
             nom_dossier = os.path.basename(dossier)
-        creer_nouveau_projet(nom_dossier)  # Créer un nouveau projet avec le nom du dossier
-        print(f"Dossier importé avec succès : {dossier}")
+
+        # Copier les fichiers .tif valides du dossier sélectionné vers le nouveau dossier
+        fichiers_tif = [fichier for fichier in os.listdir(dossier) if fichier.lower().endswith(".tif")]
+        fichiers_copiés = 0
+        for fichier_tif in fichiers_tif:
+            chemin_source = os.path.join(dossier, fichier_tif)
+            chemin_nouveau_dossier = os.path.join(os.getcwd(), "Mes projets", nom_dossier)
+            os.makedirs(chemin_nouveau_dossier, exist_ok=True)
+            chemin_destination = os.path.join(chemin_nouveau_dossier, fichier_tif)
+            try:
+                # Vérifier si le fichier est une image TIFF valide
+                Image.open(chemin_source).verify()
+                shutil.copy(chemin_source, chemin_destination)
+                fichiers_copiés += 1
+            except (IOError, SyntaxError) as e:
+                print(f"Le fichier {fichier_tif} n'est pas un fichier TIFF valide.")
+
+        if fichiers_copiés > 0:
+            messagebox.showinfo("Succès", "Dossier importé avec succès")
+            print(f"{fichiers_copiés} fichiers ont été importés avec succès depuis : {dossier}")
+        else:
+            messagebox.showinfo("Erreur", "Aucun fichier TIFF valide n'a été trouvé dans le dossier sélectionné.")
+            print("Aucun fichier TIFF valide n'a été trouvé dans le dossier sélectionné.")
     else:
         print("Aucun dossier sélectionné.")
-
+        
 fenetre = tk.Tk()
 fenetre.title("Mon Application")
 fenetre.geometry("800x800")
