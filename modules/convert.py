@@ -17,6 +17,6 @@ def convertir_fichier(nom_fichier, dossier_source, dossier_destination):
     image_16bit = image_16bit.point(lambda x: 255 * (x - min_val) / (max_val - min_val))
     image_8bit = image_16bit.convert("L")
     nom_fichier_sans_extension = os.path.splitext(nom_fichier)[0]
-    nom_fichier_converti = nom_fichier_sans_extension + "_8bit.tif"
+    nom_fichier_converti = nom_fichier_sans_extension + ".tif"
     chemin_destination = os.path.join(dossier_destination, nom_fichier_converti)
     image_8bit.save(chemin_destination)
