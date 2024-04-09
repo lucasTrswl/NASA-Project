@@ -5,6 +5,8 @@ from global_style import couleur_blanc, couleur_bleu, couleur_gris_clair
 from .Tooltip import ToolTip
 import textwrap
 from PIL import Image, ImageTk
+from .conversion_manager import conversion_manager
+from .filter_manager import filter_manager
 
 DIVIDE_WINDOW_WIDTH_BY = 120
 
@@ -42,7 +44,7 @@ def open_folder_window(folder):
 
     # Récupérer la liste des chemins d'images dans le dossier et ses sous-dossiers
     image_paths = get_image_paths(folder)
-    print("Fichiers trouvés dans le dossier:", image_paths)  # Imprime les fichiers trouvés
+    print("Fichiers trouvés dans le dossier:", image_paths)  # Imprime les fichiers trouvés    
 
     # Créer une liste d'images à partir des chemins récupérés
     images = []
