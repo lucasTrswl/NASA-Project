@@ -45,7 +45,6 @@ def conversion_manager(type, dossier_source, dossier_destination):
     # Attendre la fin de chaque thread
     for thread in threads:
         thread.join()
-    write_config_file(dossier_destination, fichiers)
     # Calculer le temps écoulé
     temps_ecoule_total = time.time() - debut_total
     print("La conversion a pris", temps_ecoule_total, "secondes.")

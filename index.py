@@ -3,14 +3,15 @@ import tkinter as tk
 from modules.progressBar import start_progress, update_progress, stop_progress
 from tkinter import ttk, filedialog, messagebox, PhotoImage
 from conversion_manager import conversion_manager
+from filter_manager import filter_manager
 from modules.interface import show_folders, configuration_canvas
-from global_style import (
-    couleur_blanc,
-)
+from modules.config_file import write_config_file
+from global_style import couleur_blanc, SETTINGS_STYLE
 
 WIDTH_WINDOW = 800
-
+PATH_PROJECTS = "Mes projets"
 liste_projets = []
+
 
 def afficher_message():
     print("Bonjour, Tkinter!")
@@ -59,6 +60,21 @@ def importer_dossier():
             nom_dossier = os.path.basename(dossier)
         liste_projets.append(nom_dossier)
         progress_bar = start_progress(content_frame, color="#F550E4")
+        full_path_destination = os.path.join(PATH_PROJECTS, nom_dossier)
+        selectedImage = filter_manager(
+            "filter", dossier, full_path_destination
+        )
+        not_selected = [
+            file for file in os.listdir(dossier) if (file not in selectedImage)
+        ]
+        write_config_file(
+            full_path_destination,
+            {"name": nom_dossier},
+            "DEFAULT",
+            default=True,
+        )
+        write_config_file(full_path_destination, selectedImage, "SELECTED")
+        write_config_file(full_path_destination, not_selected, "NOT SELECTED")
         for i in range(101):
             update_progress(progress_bar, i)
             fenetre.update_idletasks()
@@ -68,6 +84,7 @@ def importer_dossier():
         print(f"Dossier importé avec succès : {dossier}")
     else:
         print("Aucun dossier sélectionné.")
+
 
 def clear_frame(frame):
     """
@@ -87,35 +104,7 @@ fenetre.geometry("800x800")
 fenetre.configure(bg="#FFFFFF")
 style = ttk.Style()
 
-style.theme_create(
-    "gendarmerie_style",
-    parent="alt",
-    settings={
-        # "TLabel": {"configure": {"foreground": "#0055A4", "background": "#FFFFFF", "font": ('Helvetica', 12)}},
-        "TEntry": {
-            "configure": {"foreground": "#000000", "font": ("Helvetica", 12)}
-        },
-        # "TButton": {"configure": {"foreground": "#FFFFFF", "background": "#0055A4", "font": ('Helvetica', 12, 'bold')}},
-        "TFrame": {"configure": {"background": "#FFFFFF"}},
-        "TCombobox": {
-            "configure": {
-                "foreground": "#000000",
-                "background": "#FFFFFF",
-                "font": ("Helvetica", 12),
-            }
-        },
-        "TCombobox.Border": {
-            "configure": {"foreground": "#0055A4", "background": "#0055A4"}
-        },
-        "TCombobox.field": {
-            "configure": {
-                "foreground": "#000000",
-                "background": "#FFFFFF",
-                "font": ("Helvetica", 12),
-            }
-        },
-    },
-)
+style.theme_create("gendarmerie_style", parent="alt", settings=SETTINGS_STYLE)
 
 style.theme_use("gendarmerie_style")
 header_frame = ttk.Frame(fenetre)
