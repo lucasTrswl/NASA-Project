@@ -4,12 +4,14 @@ from modules.progressBar import start_progress, update_progress, stop_progress
 from tkinter import ttk, filedialog, messagebox, PhotoImage
 from conversion_manager import conversion_manager
 from filter_manager import filter_manager
+from filter_manager import filter_manager
 from modules.interface import show_folders, configuration_canvas
 from modules.config_file import write_config_file
 from global_style import couleur_blanc, SETTINGS_STYLE
 from modules.progressBar import start_progress, update_progress, stop_progress
 
 WIDTH_WINDOW = 800
+PATH_PROJECTS = "Mes projets"
 PATH_PROJECTS = "Mes projets"
 liste_projets = []
 
@@ -44,31 +46,23 @@ def menu_selection(event=None):
         show_folders(scrollable_frame, fenetre.winfo_width())
 
 
-def clear_frame(frame):
-    """
-    Fonction pour effacer tous les widgets d'un cadre.
-
-    Args:
-        frame (Frame): Cadre dont les widgets doivent être effacés.
-
-    """
-    for widget in frame.winfo_children():
-        widget.destroy()
-
-
 def importer_dossier():
+    """
+    Fonction pour importer un dossier et l'ajouter à la liste ds projets.
+    """
+
     global dossier
     dossier = filedialog.askdirectory()
     if dossier:
         nom_dossier = champ_saisie.get()
         if not nom_dossier:
             nom_dossier = os.path.basename(dossier)
+        progress_bar = start_progress(content_frame, color="#F550E4")
         full_path_destination = os.path.join(PATH_PROJECTS, nom_dossier)
         try:
             selectedImage = filter_manager(
                 "filter", dossier, full_path_destination
             )
-
             not_selected = [
                 file
                 for file in os.listdir(dossier)
@@ -84,15 +78,31 @@ def importer_dossier():
             write_config_file(
                 full_path_destination, not_selected, "NOT SELECTED"
             )
-            conversion_manager("convert", dossier, full_path_destination)
+            for i in range(101):
+                update_progress(progress_bar, i)
+                fenetre.update_idletasks()
+                fenetre.after(10)
+            stop_progress(progress_bar)
             messagebox.showinfo("Succès", "Dossier importé avec succès")
+            print(f"Dossier importé avec succès : {dossier}")
         except Exception:
             messagebox.showinfo(
                 "Succès", "L'import du dossier a été un echec ! "
             )
-
     else:
         print("Aucun dossier sélectionné.")
+
+
+def clear_frame(frame):
+    """
+    Fonction pour effacer tous les widgets d'un cadre.
+
+    Args:
+        frame (Frame): Cadre dont les widgets doivent être effacés.
+
+    """
+    for widget in frame.winfo_children():
+        widget.destroy()
 
 
 fenetre = tk.Tk()
