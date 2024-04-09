@@ -66,7 +66,7 @@ def creer_nouveau_projet(nom_dossier):
         nom_dossier (str): Nom du dossier à créer comme nouveau projet.
     """
     chemin_projets = os.path.join(
-        os.getcwd(), "Mes projets"
+        os.getcwd(), PATH_PROJECTS
     )  # Chemin du dossier 'Projets'
     nouveau_dossier = os.path.join(chemin_projets, nom_dossier)
 
@@ -83,6 +83,22 @@ def creer_nouveau_projet(nom_dossier):
 
     try:
         os.makedirs(nouveau_dossier)  # Créer le nouveau dossier dans 'Projets'
+
+        full_path_destination = os.path.join(chemin_projets, nom_dossier)
+        selectedImage = filter_manager(
+            "filter", dossier, full_path_destination
+        )
+        not_selected = [
+            file for file in os.listdir(dossier) if (file not in selectedImage)
+        ]
+        write_config_file(
+            full_path_destination,
+            {"name": nom_dossier},
+            "DEFAULT",
+            default=True,
+        )
+        write_config_file(full_path_destination, selectedImage, "SELECTED")
+        write_config_file(full_path_destination, not_selected, "NOT SELECTED")
         messagebox.showinfo("Succès", "Dossier importé avec succès")
         print(f"Nouveau projet créé : {nouveau_dossier}")
     except FileExistsError:
