@@ -92,6 +92,33 @@ def importer_dossier():
                 os.path.join(os.getcwd(), "Mes projets", nom_dossier),
             )
             if selected_files:
+                progress_bar = start_progress(content_frame, color="#F550E4")
+                full_path_destination = os.path.join(
+                    PATH_PROJECTS, nom_dossier
+                )
+
+                not_selected = [
+                    file
+                    for file in os.listdir(dossier)
+                    if (file not in selected_files)
+                ]
+                write_config_file(
+                    full_path_destination,
+                    {"name": nom_dossier},
+                    "DEFAULT",
+                    default=True,
+                )
+                write_config_file(
+                    full_path_destination, selected_files, "SELECTED"
+                )
+                write_config_file(
+                    full_path_destination, not_selected, "NOT SELECTED"
+                )
+                for i in range(101):
+                    update_progress(progress_bar, i)
+                    fenetre.update_idletasks()
+                    fenetre.after(10)
+                stop_progress(progress_bar)
                 messagebox.showinfo("Succès", "Dossier importé avec succès")
         else:
             messagebox.showerror(

@@ -1,7 +1,7 @@
 import threading
 from .convert import convertir_fichier
 from .filter import filter_images
-from .interface import is_valid_image
+from .utils import is_valid_image
 
 
 class MultiThread(threading.Thread):
